@@ -9,7 +9,6 @@ import com.example.medjool.model.Product;
 import com.example.medjool.repository.CustomerRepository;
 import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ProductRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,11 +51,15 @@ public class OrderService {
             Optional<Product> optionalProduct = productRepository.findById(order.getProductId());
 
             if (optionalProduct.isPresent()) {
-                Product product = optionalProduct.get();
-                product.setQuantity(product.getQuantity() - order.getQuantity());
-                products.add(product);
+                if(optionalProduct.get().getQuantity() != 0){
+                    Product product = optionalProduct.get();
+                    product.setQuantity(product.getQuantity() - order.getQuantity());
+                    products.add(product);
 
-                productRepository.save(product); // Save the updated product
+                    productRepository.save(product);
+                }else {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,"The product is unavailable");
+                }
             } else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product ID " + order.getProductId() + " not found");
             }
