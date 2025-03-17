@@ -1,6 +1,6 @@
 package com.example.medjool.services;
 
-import com.example.medjool.repository.ManageRepository;
+import com.example.medjool.repository.ManagerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ManagerDetailService implements UserDetailsService {
-    private final ManageRepository manageRepository;
+    private final ManagerRepository managerRepository;
 
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return manageRepository.findByEmail(username);
+        return managerRepository.findByEmail(username);
     }
 }

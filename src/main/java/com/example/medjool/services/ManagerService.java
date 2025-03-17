@@ -4,7 +4,7 @@ import com.example.medjool.dto.BearerToken;
 import com.example.medjool.dto.LoginDto;
 import com.example.medjool.dto.UserDetailsDto;
 import com.example.medjool.model.Manager;
-import com.example.medjool.repository.ManageRepository;
+import com.example.medjool.repository.ManagerRepository;
 import com.example.medjool.security.JwtUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,21 +21,21 @@ public class ManagerService {
 
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final ManageRepository manageRepository;
+    private final ManagerRepository managerRepository;
     private final JwtUtilities jwtUtilities;
 
     @Autowired
     public ManagerService(PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                          ManageRepository manageRepository, JwtUtilities jwtUtilities) {
+                          ManagerRepository manageRepository, JwtUtilities jwtUtilities) {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
-        this.manageRepository = manageRepository;
+        this.managerRepository = manageRepository;
         this.jwtUtilities = jwtUtilities;
     }
 
 
     public ResponseEntity<?> authentication(LoginDto loginDto){
-        Manager manager = manageRepository.findByEmail(loginDto.getUserName());
+        Manager manager = managerRepository.findByEmail(loginDto.getUserName());
 
         if(manager.getPassword().equals(passwordEncoder.encode(loginDto.getPassword()))){
             Authentication authentication = authenticationManager.authenticate(

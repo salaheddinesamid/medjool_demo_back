@@ -7,6 +7,7 @@ import io.jsonwebtoken.*;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 
@@ -26,6 +27,23 @@ public class JwtUtilities {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS256,SECRET_KEY)
                 .compact();
+    }
+
+    public String extractUserName(String token){
+        return extractClaim(token,Claims::getSubject);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims,T> claimsTFunction){
+        final Claims claims = extractAllClaims(token);
+        return claimsTFunction.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts
+                .parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public String getToken(HttpServletRequest httpServletRequest){
