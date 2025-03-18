@@ -29,6 +29,9 @@ public class Manager implements UserDetails {
     @Column(name = "email")
     String email;
 
+    @Column(name = "password")
+    String password;
+
     @OneToOne
     Role role;
 
