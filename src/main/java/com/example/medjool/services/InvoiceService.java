@@ -8,6 +8,7 @@ import com.example.medjool.repository.CustomerRepository;
 import com.example.medjool.repository.InvoiceRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class InvoiceService {
         this.customerRepository = customerRepository;
     }
 
+    //@CachePut(value = "")
     public void newInvoice(InvoiceDto invoiceDto){
         try{
             Customer customer = customerRepository.findByName(invoiceDto.getClient());
@@ -44,11 +46,14 @@ public class InvoiceService {
             invoice.setDateOfExpiration(expirationDate);
 
             invoiceRepository.save(invoice);
+
+            //return invoice;
         }catch(Exception exception){
             throw exception;
         }
     }
 
+    //@Cacheable(value = "invoices")
     public ResponseEntity<List<Invoice>> getAllInvoices(){
         return new ResponseEntity<>(invoiceRepository.findAll(),HttpStatus.OK);
     }
