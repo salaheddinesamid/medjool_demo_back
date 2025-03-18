@@ -4,7 +4,9 @@ import com.example.medjool.dto.BearerToken;
 import com.example.medjool.dto.LoginDto;
 import com.example.medjool.dto.UserDetailsDto;
 import com.example.medjool.model.Manager;
+
 import com.example.medjool.repository.ManagerRepository;
+import com.example.medjool.repository.RoleRepository;
 import com.example.medjool.security.JwtUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,15 +25,39 @@ public class ManagerService {
     private final AuthenticationManager authenticationManager;
     private final ManagerRepository managerRepository;
     private final JwtUtilities jwtUtilities;
+    private final RoleRepository roleRepository;
 
     @Autowired
     public ManagerService(PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
-                          ManagerRepository manageRepository, JwtUtilities jwtUtilities) {
+                          ManagerRepository manageRepository, JwtUtilities jwtUtilities, RoleRepository roleRepository) {
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.managerRepository = manageRepository;
         this.jwtUtilities = jwtUtilities;
+        this.roleRepository = roleRepository;
     }
+
+
+    /*
+    public ResponseEntity<?> register(RegistrationDto registrationDto){
+
+        if(!managerRepository.existsByEmail(registrationDto.getEmail())){
+            Manager manager = new Manager();
+            manager.setFirstName(registrationDto.getFirstName());
+            manager.setLastName(registrationDto.getLastName());
+            manager.setEmail(registrationDto.getEmail());
+            manager.
+            Role role = roleRepository.findRoleByRoleName("MANAGER");
+            manager.setRole(role);
+
+            String token = jwtUtilities.generateToken(manager.getEmail(),manager.getRole().getRoleName());
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken()
+            )
+        }
+    }
+
+     */
 
 
     public ResponseEntity<?> authentication(LoginDto loginDto){

@@ -19,8 +19,8 @@ public class Commande {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @OneToMany
-    private List<Product> products;
+    @OneToMany(mappedBy = "commande")
+    private List<CommandeProduct> commandeProducts;
 
     @Column(name = "status", nullable = false)
     private String status;

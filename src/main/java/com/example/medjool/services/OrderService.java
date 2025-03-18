@@ -1,11 +1,14 @@
 package com.example.medjool.services;
 
+import com.example.medjool.dto.CommandeDto;
 import com.example.medjool.dto.InvoiceDto;
 import com.example.medjool.dto.OrderDto;
 import com.example.medjool.dto.ProductDto;
 import com.example.medjool.model.Commande;
+import com.example.medjool.model.CommandeProduct;
 import com.example.medjool.model.Customer;
 import com.example.medjool.model.Product;
+import com.example.medjool.repository.CommandeProductRepository;
 import com.example.medjool.repository.CustomerRepository;
 import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ProductRepository;
@@ -20,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -28,52 +32,73 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final InvoiceService invoiceService;
     private final CustomerRepository customerRepository;
+    private final CommandeProductRepository commandeProductRepository;
     private final OrderRepository orderRepository;
+    private final PdfGenerator pdfGenerator;
     //private final PackageRepository packageRepository;
 
     @Autowired
-    public OrderService(ProductRepository productRepository, InvoiceService invoiceService, CustomerRepository customerRepository, OrderRepository orderRepository) {
+    public OrderService(ProductRepository productRepository, InvoiceService invoiceService, CustomerRepository customerRepository, CommandeProductRepository commandeProductRepository, OrderRepository orderRepository, PdfGenerator pdfGenerator) {
         this.productRepository = productRepository;
         //this.packageRepository = packageRepository;
         this.invoiceService = invoiceService;
         this.customerRepository = customerRepository;
+        this.commandeProductRepository = commandeProductRepository;
         this.orderRepository = orderRepository;
+        this.pdfGenerator = pdfGenerator;
     }
 
     @CachePut(value = "order_process")
     @Transactional
     public ResponseEntity<?> processOrder(OrderDto orderDto) {
         List<ProductDto> orders = orderDto.getProductsDto();
-        List<Product> products = new ArrayList<>();
+        List<CommandeProduct> orderItems = new ArrayList<>();
 
         Customer customer = customerRepository.findByName(orderDto.getClient());
-        orders.forEach(order -> {
-            Optional<Product> optionalProduct = productRepository.findById(order.getProductId());
+        if (customer == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer not found");
+        }
 
-            if (optionalProduct.isPresent()) {
-                if(optionalProduct.get().getQuantity() != 0){
-                    Product product = optionalProduct.get();
-                    product.setQuantity(product.getQuantity() - order.getQuantity());
-                    products.add(product);
-
-                    productRepository.save(product);
-                }else {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT,"The product is unavailable");
-                }
-            } else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product ID " + order.getProductId() + " not found");
-            }
-        });
-
-        // Create order:
+        // Create Order
         Commande order = new Commande();
-        order.setProducts(products);
         order.setCustomer(customer);
         order.setStatus("IN PROCESSING");
-        orderRepository.save(order);
 
-        // Generate invoice:
+        order = orderRepository.save(order);  // Save to get orderId
 
+        // Process each product in the order
+        for (ProductDto orderDtoProduct : orders) {
+            Optional<Product> optionalProduct = productRepository.findById(orderDtoProduct.getProductId());
+
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+
+                if (product.getQuantity() >= orderDtoProduct.getQuantity()) {
+                    product.setQuantity(product.getQuantity() - orderDtoProduct.getQuantity());
+                    productRepository.save(product);
+
+                    // Create Order-Product Mapping
+                    CommandeProduct orderProduct = new CommandeProduct();
+                    orderProduct.setCommande(order);
+                    orderProduct.setProduct(product);
+                    orderProduct.setQuantity(orderDtoProduct.getQuantity());
+
+                    orderItems.add(orderProduct);
+                } else {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Not enough stock for Product ID " + orderDtoProduct.getProductId());
+                }
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product ID " + orderDtoProduct.getProductId() + " not found");
+            }
+        }
+
+        // Save Order Items
+        commandeProductRepository.saveAll(orderItems);
+
+        // Generate PDF
+        pdfGenerator.generateOrderPdf(order);
+
+        // Generate Invoice
         InvoiceDto invoiceDto = new InvoiceDto();
         invoiceDto.setClient(customer.getName());
         invoiceDto.setTotalAmount(orderDto.getTotal());
@@ -83,9 +108,33 @@ public class OrderService {
         return new ResponseEntity<>("Order has been completed successfully", HttpStatus.OK);
     }
 
-    @Cacheable(value = "orders")
-    public ResponseEntity<List<Commande>> getAllOrders(){
+
+    @Cacheable(value = "all_orders")
+    public ResponseEntity<List<CommandeDto>> getAllCommandes() {
         List<Commande> commandes = orderRepository.findAll();
-        return new ResponseEntity<>(commandes,HttpStatus.OK);
+
+        // Convert Commande to CommandeDto
+        List<CommandeDto> response = commandes.stream().map(order -> {
+            CommandeDto dto = new CommandeDto();
+            dto.setOrderId(order.getOrderId());
+            dto.setCustomerName(order.getCustomer().getName());
+            dto.setStatus(order.getStatus());
+
+            // Convert CommandeProduct to ProductDto
+            List<ProductDto> productDtos = order.getCommandeProducts().stream().map(orderProduct -> {
+                ProductDto productDto = new ProductDto();
+                productDto.setProductId(orderProduct.getProduct().getProductId());
+                productDto.setType(orderProduct.getProduct().getType());
+                productDto.setColor(orderProduct.getProduct().getColor());
+                productDto.setPrice(orderProduct.getProduct().getPrice());
+                productDto.setQuantity(orderProduct.getQuantity());
+                return productDto;
+            }).collect(Collectors.toList());
+
+            dto.setProducts(productDtos);
+            return dto;
+        }).collect(Collectors.toList());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

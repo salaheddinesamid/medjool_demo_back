@@ -5,6 +5,9 @@ import lombok.Data;
 @Data
 public class ProductDto {
 
-    Integer productId;
-    Integer quantity;
+    private Integer productId;
+    private String type;
+    private String color;
+    private Float price;
+    private Integer quantity;
 }

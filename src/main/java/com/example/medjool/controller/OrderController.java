@@ -25,7 +25,7 @@ public class OrderController {
 
     @GetMapping("/get_all")
     public ResponseEntity<?> getAll(){
-        return orderService.getAllOrders();
+        return orderService.getAllCommandes();
     }
 
 }
