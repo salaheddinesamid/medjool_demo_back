@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 public class FileHandling {
 
     // upload file
+    /*
     public ResponseEntity<Object> downloadOrderPDF(Integer id){
 
     }
+
+     */
 
 }

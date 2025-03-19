@@ -1,9 +1,9 @@
 package com.example.medjool.model;
 
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 
 @Entity
 @Getter
@@ -14,21 +14,22 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer productId;
 
-    @Column(name = "type")
-    String type;
+    @Column(name = "brand")
+    String brand;
+
+    @Column(name = "callibre")
+    String callibre;
+
+    @Column(name = "price_per_kg")
+    Float pricePerKg;
+
+    @Column(name = "total_weight")
+    Float totalWeight;
 
     @Column(name = "color")
     String color;
 
-    @Column(name = "capacity")
-    Float packaging;
-
-    @Column(name = "price")
-    Float price;
-
-    @Column(name = "quantity")
-    Integer quantity;
-
-
+    @Column(name = "farm")
+    String farm;
 
 }

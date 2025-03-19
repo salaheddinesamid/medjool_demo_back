@@ -1,6 +1,5 @@
 package com.example.medjool.services;
 
-import com.example.medjool.model.Commande;
 import com.example.medjool.model.Invoice;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;

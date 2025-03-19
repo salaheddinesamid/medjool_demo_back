@@ -4,8 +4,6 @@ import com.example.medjool.dto.CommandeDto;
 import com.example.medjool.dto.InvoiceDto;
 import com.example.medjool.dto.OrderDto;
 import com.example.medjool.dto.ProductDto;
-import com.example.medjool.model.Commande;
-import com.example.medjool.model.CommandeProduct;
 import com.example.medjool.model.Customer;
 import com.example.medjool.model.Product;
 import com.example.medjool.repository.CommandeProductRepository;
