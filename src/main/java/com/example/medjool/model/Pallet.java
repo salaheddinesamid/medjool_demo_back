@@ -19,6 +19,11 @@ public class Pallet {
     @Column(name = "number_of_boxes_in_carton")
     Integer numberOfBoxesInCarton;
 
+    @Column(name = "number_of_cartons_in_story")
+    Integer numberOfCartonsInStory;
+
+    @Column(name = "number_of_stories_in_pallet")
+    Integer numberOfStoriesInPallet;
 
 
     @Column(name = "tag")
