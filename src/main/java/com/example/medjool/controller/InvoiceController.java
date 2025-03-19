@@ -1,5 +1,6 @@
 package com.example.medjool.controller;
 
+/**
 import com.example.medjool.model.Invoice;
 import com.example.medjool.services.InvoiceService;
 import org.springframework.http.ResponseEntity;
@@ -23,4 +24,4 @@ public class InvoiceController {
     public ResponseEntity<List<Invoice>> getAll(){
         return invoiceService.getAllInvoices();
     }
-}
+}**/

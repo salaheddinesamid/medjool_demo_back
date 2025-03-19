@@ -1,6 +1,5 @@
 package com.example.medjool.services;
 
-import com.example.medjool.model.Invoice;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
@@ -13,6 +12,7 @@ import java.io.FileOutputStream;
 
 @Service
 public class PdfGenerator {
+    /*
 
     private void generateInvoicePdf(Invoice invoice){
 
@@ -40,4 +40,6 @@ public class PdfGenerator {
             throw new RuntimeException(e);
         }
     }
+    
+     */
 }

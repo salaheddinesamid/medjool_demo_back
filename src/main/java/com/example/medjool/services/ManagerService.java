@@ -1,5 +1,5 @@
 package com.example.medjool.services;
-
+/**
 import com.example.medjool.dto.BearerToken;
 import com.example.medjool.dto.LoginDto;
 import com.example.medjool.dto.UserDetailsDto;
@@ -38,7 +38,7 @@ public class ManagerService {
     }
 
 
-    /*
+
     public ResponseEntity<?> register(RegistrationDto registrationDto){
 
         if(!managerRepository.existsByEmail(registrationDto.getEmail())){
@@ -57,7 +57,6 @@ public class ManagerService {
         }
     }
 
-     */
 
 
     public ResponseEntity<?> authentication(LoginDto loginDto){
@@ -82,4 +81,4 @@ public class ManagerService {
             return new ResponseEntity<>("Authentication Failed", HttpStatus.NOT_FOUND);
         }
     }
-}
+}**/

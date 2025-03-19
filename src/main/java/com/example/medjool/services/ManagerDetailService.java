@@ -1,5 +1,5 @@
 package com.example.medjool.services;
-
+/**
 import com.example.medjool.repository.ManagerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,4 +17,4 @@ public class ManagerDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return managerRepository.findByEmail(username);
     }
-}
+}**/

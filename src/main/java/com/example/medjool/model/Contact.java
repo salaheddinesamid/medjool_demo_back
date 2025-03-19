@@ -4,23 +4,20 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
-public class Client {
+public class Contact {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer clientId;
+    Integer contactId;
 
-    @Column(name = "name")
-    String name;
+    @Column(name = "email")
+    private String email;
 
-    @OneToMany
-    List<Address> addresses;
+    @Column(name = "phone")
+    private String phone;
 
-    @OneToMany
-    List<Contact> contacts;
+
 }

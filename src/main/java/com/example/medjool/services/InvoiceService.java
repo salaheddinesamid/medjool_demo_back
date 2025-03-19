@@ -1,5 +1,5 @@
 package com.example.medjool.services;
-
+/**
 
 import com.example.medjool.dto.InvoiceDto;
 import com.example.medjool.model.Customer;
@@ -58,3 +58,4 @@ public class InvoiceService {
         return new ResponseEntity<>(invoiceRepository.findAll(),HttpStatus.OK);
     }
 }
+ **/

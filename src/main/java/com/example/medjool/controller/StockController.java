@@ -1,36 +1,32 @@
 package com.example.medjool.controller;
 
 import com.example.medjool.model.Product;
-import com.example.medjool.services.ProductService;
+import com.example.medjool.services.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/product/")
-public class ProductController {
+@RequestMapping("api/stock/")
+public class StockController {
 
-    private final ProductService productService;
+    private final StockService stockService;
 
     @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    public StockController(StockService stockService) {
+        this.stockService = stockService;
     }
 
 
-    @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Integer id){
-        return productService.getProduct(id);
-    }
-
-    @GetMapping("/")
-    public List<Product> getAll(){
-        return productService.getAllProducts();
+    @GetMapping("get_all")
+    public ResponseEntity<List<Product>> getAll() {
+        List<Product> allProducts = stockService.getAllProducts();
+        return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }
 
     /*

@@ -1,4 +1,7 @@
 package com.example.medjool.repository;
 
-public interface ProductOrderRepository {
+import com.example.medjool.model.ProductOrder;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductOrderRepository extends JpaRepository<ProductOrder, Integer> {
 }

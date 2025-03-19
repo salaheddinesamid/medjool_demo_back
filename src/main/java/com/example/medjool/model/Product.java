@@ -32,4 +32,7 @@ public class Product {
     @Column(name = "farm")
     String farm;
 
+    @Column(name = "quality")
+    String quality;
+
 }
