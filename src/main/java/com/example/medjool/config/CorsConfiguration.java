@@ -30,6 +30,7 @@ public class CorsConfiguration{
                 .disable()
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry.requestMatchers(
                         "api/manager/**","/api/invoice/**",
+                                        "api/file/**",
                                         "api/product/**",
                                         "api/order/**").permitAll()
                 );
