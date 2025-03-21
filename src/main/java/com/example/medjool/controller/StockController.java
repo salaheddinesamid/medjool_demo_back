@@ -1,13 +1,12 @@
 package com.example.medjool.controller;
 
+import com.example.medjool.dto.StockAvailabilityDto;
 import com.example.medjool.model.Product;
 import com.example.medjool.services.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,6 +26,11 @@ public class StockController {
     public ResponseEntity<List<Product>> getAll() {
         List<Product> allProducts = stockService.getAllProducts();
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
+    }
+
+    @PostMapping("check_availability")
+    public ResponseEntity<Object> checkAvailability(@RequestBody StockAvailabilityDto stockAvailabilityDto) {
+        return stockService.stockAvailability(stockAvailabilityDto);
     }
 
     /*

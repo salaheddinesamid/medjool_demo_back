@@ -25,6 +25,9 @@ public class Pallet {
     @Column(name = "number_of_stories_in_pallet")
     Integer numberOfStoriesInPallet;
 
+    @Column(name = "total_net")
+    Float totalNet;
+
 
     @Column(name = "tag")
     String tag;

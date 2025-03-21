@@ -1,6 +1,5 @@
 package com.example.medjool.model;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,29 +9,59 @@ import lombok.Setter;
 @Setter
 public class Product {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer productId;
+    private Integer productId;
 
-    @Column(name = "brand")
-    String brand;
+    @Column(nullable = false)
+    private String brand;
 
-    @Column(name = "callibre")
-    String callibre;
+    @Column(nullable = false)
+    private String callibre;
 
-    @Column(name = "price_per_kg")
-    Float pricePerKg;
+    @Column(name = "price_per_kg", nullable = false)
+    private Float pricePerKg;
 
-    @Column(name = "total_weight")
-    Float totalWeight;
+    @Column(name = "total_weight", nullable = false)
+    private Float totalWeight;
 
-    @Column(name = "color")
-    String color;
+    @Column(nullable = false)
+    private String color;
 
-    @Column(name = "farm")
-    String farm;
+    @Column(nullable = false)
+    private String farm;
 
-    @Column(name = "quality")
-    String quality;
+    @Column(nullable = false)
+    private String quality;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ProductStatus status;
+
+    // Automatically set status before saving to the database
+    @PrePersist
+    @PreUpdate
+    public void updateStatus() {
+        if (totalWeight != null && totalWeight > 100) {
+            this.status = ProductStatus.AVAILABLE;
+        } else {
+            this.status = ProductStatus.NOT_AVAILABLE;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId=" + productId +
+                ", brand='" + brand + '\'' +
+                ", callibre='" + callibre + '\'' +
+                ", pricePerKg=" + pricePerKg +
+                ", totalWeight=" + totalWeight +
+                ", color='" + color + '\'' +
+                ", farm='" + farm + '\'' +
+                ", quality='" + quality + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

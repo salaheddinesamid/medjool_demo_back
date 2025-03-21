@@ -15,12 +15,21 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer clientId;
 
-    @Column(name = "name")
-    String name;
+    @Column(name = "company_name")
+    String companyName;
+
+    @Column(name = "general_manager")
+    String generalManager;
+
+    @Column(name = "company_activity")
+    String companyActivity;
 
     @OneToMany
     List<Address> addresses;
 
     @OneToMany
     List<Contact> contacts;
+
+    @Column(name = "status")
+    String status;
 }
