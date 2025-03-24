@@ -56,9 +56,7 @@ public class StockService {
 
     public ResponseEntity<Object> stockAvailability(StockAvailabilityDto stockAvailabilityDto) {
 
-        Product product = productRepository.findByCallibreAndQuality(
-                stockAvailabilityDto.getCallibre(), stockAvailabilityDto.getQuality()
-        );
+        Product product = productRepository.findById(stockAvailabilityDto.getProductId()).get();
 
         if(product == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

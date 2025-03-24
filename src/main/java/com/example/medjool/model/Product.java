@@ -3,12 +3,14 @@ package com.example.medjool.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 public class Product {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +41,6 @@ public class Product {
     @Column(nullable = false)
     private ProductStatus status;
 
-    // Automatically set status before saving to the database
     @PrePersist
     @PreUpdate
     public void updateStatus() {
@@ -48,20 +49,5 @@ public class Product {
         } else {
             this.status = ProductStatus.NOT_AVAILABLE;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "productId=" + productId +
-                ", brand='" + brand + '\'' +
-                ", callibre='" + callibre + '\'' +
-                ", pricePerKg=" + pricePerKg +
-                ", totalWeight=" + totalWeight +
-                ", color='" + color + '\'' +
-                ", farm='" + farm + '\'' +
-                ", quality='" + quality + '\'' +
-                ", status=" + status +
-                '}';
     }
 }

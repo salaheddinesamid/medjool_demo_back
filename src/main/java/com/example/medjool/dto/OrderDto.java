@@ -2,14 +2,15 @@ package com.example.medjool.dto;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class OrderDto {
 
-
-    String client;
-    List<ProductDto> productsDto;
-    Float total;
+    String clientName;
+    ShippingDetailsDto shippingDetails;
+    Integer productId;
+    Float totalWeight;
+    Double totalPrice;
+    Float packaging;
+    Integer numberOfPallets;
 
 }

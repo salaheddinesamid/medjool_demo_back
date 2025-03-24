@@ -1,12 +1,14 @@
 package com.example.medjool.controller;
 
 import com.example.medjool.dto.OrderDto;
+import com.example.medjool.model.Order;
 import com.example.medjool.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
+import java.util.List;
+
 @RestController
 @RequestMapping("api/order")
 public class OrderController {
@@ -21,13 +23,12 @@ public class OrderController {
 
     @PostMapping("")
     public ResponseEntity<?> makeOrder(@RequestBody OrderDto orderDto){
-        return orderService.processOrder(orderDto);
+        return orderService.createOrder(orderDto);
     }
 
     @GetMapping("/get_all")
-    public ResponseEntity<?> getAll(){
-        return orderService.getAllCommandes();
+    public List<Order> getAll(){
+        return orderService.getAllOrders();
     }
 
 }
- **/

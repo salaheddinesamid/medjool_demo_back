@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 public class StockAvailabilityDto {
 
-    String callibre;
-    String quality;
+    Integer productId;
     Long totalQuantity;
 }

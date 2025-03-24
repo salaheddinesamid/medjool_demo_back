@@ -15,12 +15,12 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -96,4 +96,14 @@ class ClientTesting {
         assertEquals(clientDto.getPhone(), savedClient.getContacts().get(0).getPhone());
         assertEquals(clientDto.getAddressDtoList().size(), savedClient.getAddresses().size());
     }
+
+
+
+
+    @Test
+    void getAllClients() {
+        List<Client> clients = clientService.getAllClients();
+        assertNotNull(clients);
+    }
+
 }

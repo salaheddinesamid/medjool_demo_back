@@ -1,5 +1,6 @@
 package com.example.medjool.services;
 
+import com.example.medjool.dto.AddressDto;
 import com.example.medjool.dto.ClientDto;
 import com.example.medjool.model.Address;
 import com.example.medjool.model.Client;
@@ -77,4 +78,37 @@ public class ClientService {
         List<Client> clients = clientRepository.findAll();
         return new ResponseEntity<>(clients,HttpStatus.OK);
     }
+
+
+    /*
+    public ResponseEntity<Client> updateClient(ClientDto updatedClientDto) {
+
+        Client client = clientRepository.findByCompanyName(
+                updatedClientDto.getNameOfCompany()
+        );
+
+        if(client != null) {
+            List<Address> newClientAddresses = new ArrayList<>();
+            client.setCompanyName(updatedClientDto.getNameOfCompany());
+            for (AddressDto addressDto : updatedClientDto.getAddressDtoList()) {
+                Address address = new Address();
+                address.setCity(addressDto.getCity());
+                address.setCountry(addressDto.getCountry());
+                address.setStreet(addressDto.getStreet());
+                address.setState(addressDto.getState());
+                address.setPostalCode(addressDto.getPostalCode());
+                address = addressRepository.save(address);
+                newClientAddresses.add(address);
+            }
+            client.setAddresses(newClientAddresses);
+
+            clientRepository.save(client);
+
+        }
+        return new ResponseEntity<>(client, HttpStatus.OK);
+    }
+
+     */
+
 }
+
