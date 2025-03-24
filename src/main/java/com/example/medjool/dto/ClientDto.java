@@ -1,13 +1,11 @@
 package com.example.medjool.dto;
 
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class ClientDto {
     private String nameOfCompany;
     private String nameOfGeneralManager;

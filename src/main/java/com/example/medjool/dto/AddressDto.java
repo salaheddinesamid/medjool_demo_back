@@ -1,10 +1,10 @@
 package com.example.medjool.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 public class AddressDto {
     private String street;
     private String city;

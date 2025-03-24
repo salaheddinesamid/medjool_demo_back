@@ -1,6 +1,5 @@
 package com.example.medjool.controller;
 
-import com.example.medjool.dto.StockAvailabilityDto;
 import com.example.medjool.model.Product;
 import com.example.medjool.services.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +25,6 @@ public class StockController {
     public ResponseEntity<List<Product>> getAll() {
         List<Product> allProducts = stockService.getAllProducts();
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
-    }
-
-    @PostMapping("check_availability")
-    public ResponseEntity<Object> checkAvailability(@RequestBody StockAvailabilityDto stockAvailabilityDto) {
-        return stockService.stockAvailability(stockAvailabilityDto);
     }
 
     /*

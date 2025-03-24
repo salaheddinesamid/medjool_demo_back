@@ -40,8 +40,8 @@ public class ClientService {
         List<Contact> clientContacts = new ArrayList<>();
 
         // Create and save Addresses properly
-        clientDto.getAddressDtoList().forEach(addressDto -> {
-            Address address = new Address(); // ✅ Create a NEW instance for each address
+        for (AddressDto addressDto : clientDto.getAddressDtoList()) {
+            Address address = new Address(); // Create a NEW instance for each address
             address.setCity(addressDto.getCity());
             address.setCountry(addressDto.getCountry());
             address.setStreet(addressDto.getStreet());
@@ -51,7 +51,7 @@ public class ClientService {
             // Save the address
             address = addressRepository.save(address);
             clientAddresses.add(address);
-        });
+        }
 
         // Create and save Contact
         Contact contact = new Contact();

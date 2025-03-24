@@ -1,6 +1,5 @@
 package com.example.medjool.services;
 
-import com.example.medjool.dto.StockAvailabilityDto;
 import com.example.medjool.model.Product;
 import com.example.medjool.repository.ProductRepository;
 import org.apache.commons.csv.CSVFormat;
@@ -51,22 +50,5 @@ public class StockService {
             productRepository.save(product);
         }
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-
-    public ResponseEntity<Object> stockAvailability(StockAvailabilityDto stockAvailabilityDto) {
-
-        Product product = productRepository.findById(stockAvailabilityDto.getProductId()).get();
-
-        if(product == null){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else if (product.getTotalWeight() < stockAvailabilityDto.getTotalQuantity()) {
-            return new ResponseEntity<>(product.getTotalWeight(), HttpStatus.BAD_REQUEST);
-        } else if (product.getTotalWeight() > stockAvailabilityDto.getTotalQuantity()) {
-            return new ResponseEntity<>("The product is available in the stock", HttpStatus.BAD_REQUEST);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
     }
 }
