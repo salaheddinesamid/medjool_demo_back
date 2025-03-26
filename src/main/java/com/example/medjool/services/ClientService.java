@@ -30,10 +30,13 @@ public class ClientService {
         this.contactRepository = contactRepository;
     }
 
+    // Return all clients:
     public List<Client> getAllClients(){
         return clientRepository.findAll();
     }
 
+
+    // Add new client:
     public ResponseEntity<Object> addClient(ClientDto clientDto) {
         Client client = new Client();
         List<Address> clientAddresses = new ArrayList<>();
@@ -79,13 +82,13 @@ public class ClientService {
         return new ResponseEntity<>(clients,HttpStatus.OK);
     }
 
-
-    /*
-    public ResponseEntity<Client> updateClient(ClientDto updatedClientDto) {
+    // Update client information:
+    public ResponseEntity<Client> updateClient(Integer clientId,ClientDto updatedClientDto) {
 
         Client client = clientRepository.findByCompanyName(
                 updatedClientDto.getNameOfCompany()
         );
+
 
         if(client != null) {
             List<Address> newClientAddresses = new ArrayList<>();
@@ -108,7 +111,10 @@ public class ClientService {
         return new ResponseEntity<>(client, HttpStatus.OK);
     }
 
-     */
-
+    // Delete a client:
+    public ResponseEntity<Object> deleteClient(Integer clientId) {
+        clientRepository.deleteById(clientId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
 

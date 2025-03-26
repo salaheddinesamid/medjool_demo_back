@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +42,8 @@ class ClientTesting {
 
     @Mock
     private ClientRepository clientRepository;
+
+    Logger logger = Logger.getLogger(ClientTesting.class.getName());
 
     @Test
     void testAddClient() {
@@ -103,6 +106,7 @@ class ClientTesting {
     @Test
     void getAllClients() {
         List<Client> clients = clientService.getAllClients();
+        logger.info(clients.toString());
         assertNotNull(clients);
     }
 

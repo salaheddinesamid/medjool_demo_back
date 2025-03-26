@@ -1,6 +1,7 @@
 package com.example.medjool.controller;
 
 import com.example.medjool.dto.OrderDto;
+import com.example.medjool.dto.OrderStatusDto;
 import com.example.medjool.model.Order;
 import com.example.medjool.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,4 +32,9 @@ public class OrderController {
         return orderService.getAllOrders();
     }
 
+    @PutMapping("update/{orderId}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusDto newStatus){
+
+        return orderService.updateOrderStatus(orderId, newStatus);
+    }
 }

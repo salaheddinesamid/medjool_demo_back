@@ -31,4 +31,9 @@ public class ClientController {
     public ResponseEntity<List<Client>> getAllClients() {
         return clientService.getAll();
     }
+
+    @PutMapping("update/{client_id}")
+    public ResponseEntity<Client> updateClient(@PathVariable Integer client_id, @RequestBody ClientDto client) {
+        return clientService.updateClient(client_id,client);
+    }
 }

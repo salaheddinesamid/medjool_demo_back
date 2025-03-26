@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PalletService {
 
@@ -16,7 +18,6 @@ public class PalletService {
     public PalletService(PalletRepository palletRepository) {
         this.palletRepository = palletRepository;
     }
-
 
     public ResponseEntity<Object> addPallet(PalletDto palletDto) {
 
@@ -37,6 +38,12 @@ public class PalletService {
         palletRepository.save(pallet);
 
         return ResponseEntity.ok().body(pallet);
+    }
+
+
+    public ResponseEntity<List<Pallet>> getAllPallets(){
+        List<Pallet> pallets = palletRepository.findAll();
+        return ResponseEntity.ok().body(pallets);
     }
 
 }

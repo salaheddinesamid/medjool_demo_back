@@ -1,11 +1,14 @@
 package com.example.medjool.services;
 
+import com.example.medjool.model.Order;
+import com.itextpdf.kernel.pdf.PdfWriter;
 import org.springframework.stereotype.Service;
 
 
 @Service
 public class PdfGenerator {
     /*
+
 
     private void generateInvoicePdf(Invoice invoice){
 
@@ -35,4 +38,5 @@ public class PdfGenerator {
     }
     
      */
+
 }

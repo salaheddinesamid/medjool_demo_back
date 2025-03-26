@@ -1,6 +1,8 @@
 package com.example.medjool.controller;
 
+import com.example.medjool.dto.OverviewDto;
 import com.example.medjool.model.Product;
+import com.example.medjool.services.OverviewService;
 import com.example.medjool.services.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +16,12 @@ import java.util.List;
 public class StockController {
 
     private final StockService stockService;
+    private final OverviewService overviewService;
 
     @Autowired
-    public StockController(StockService stockService) {
+    public StockController(StockService stockService, OverviewService overviewService) {
         this.stockService = stockService;
+        this.overviewService = overviewService;
     }
 
 
@@ -27,13 +31,11 @@ public class StockController {
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }
 
-    /*
-    @GetMapping("/availability/{id}")
-    public ResponseEntity<?> checkProductAvailability(@PathVariable Integer id){
-        return productService.productAvailability(id);
+
+    @GetMapping("overview")
+    public ResponseEntity<OverviewDto> getStockOverview() {
+        return overviewService.getOverview();
     }
 
-     */
-
-
+    
 }

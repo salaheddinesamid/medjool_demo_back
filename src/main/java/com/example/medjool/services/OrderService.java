@@ -1,6 +1,9 @@
 package com.example.medjool.services;
 
+
+import com.example.medjool.controller.NotificationController;
 import com.example.medjool.dto.OrderDto;
+import com.example.medjool.dto.OrderStatusDto;
 import com.example.medjool.model.Client;
 import com.example.medjool.model.Order;
 import com.example.medjool.model.Product;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,12 +24,14 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
+    private final NotificationController notificationController;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, ClientRepository clientRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, ClientRepository clientRepository, ProductRepository productRepository, NotificationController notificationController) {
         this.orderRepository = orderRepository;
         this.clientRepository = clientRepository;
         this.productRepository = productRepository;
+        this.notificationController = notificationController;
     }
 
 
@@ -52,6 +58,11 @@ public class OrderService {
 
             // Deduct stock and save the updated product
             product.setTotalWeight(product.getTotalWeight() - orderDto.getTotalWeight());
+            if (product.getTotalWeight() >= 100) {
+                notificationController.sendLowStockNotification(
+                        "Attention, le produit: " + product.getCallibre() + "-" + product.getQuality() + " est low stock"
+                );
+            }
             productRepository.save(product);
 
             // Create and save the order
@@ -63,10 +74,26 @@ public class OrderService {
             order.setStatus("PRELIMINARY");
             orderRepository.save(order);
 
+            // Send WebSocket Notification
+            String notificationMessage = "Nouvelle commande crée pour " + client.getCompanyName() +
+                    " | Produit: " + product.getBrand() + " " + product.getCallibre();
+            notificationController.sendLowStockNotification(notificationMessage);
+
             return ResponseEntity.ok("Order created successfully.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error creating order: " + e.getMessage());
         }
+    }
+
+    public ResponseEntity<Object> updateOrderStatus(Long orderId, OrderStatusDto orderStatusDto) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return ResponseEntity.badRequest().body("Order not found.");
+        }
+
+        order.setStatus(orderStatusDto.getNewStatus());
+        orderRepository.save(order);
+        return ResponseEntity.ok("Order updated successfully.");
     }
 
 

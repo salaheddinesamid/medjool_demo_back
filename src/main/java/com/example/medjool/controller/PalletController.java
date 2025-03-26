@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/pallet")
 public class PalletController {
@@ -25,6 +27,8 @@ public class PalletController {
         return palletService.addPallet(palletDto);
     }
 
-
-
+    @PostMapping("/get_all")
+    public ResponseEntity<List<Pallet>> getAllPallet() {
+        return palletService.getAllPallets();
+    }
 }
