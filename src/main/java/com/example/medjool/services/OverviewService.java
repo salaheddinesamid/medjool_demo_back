@@ -5,7 +5,6 @@ import com.example.medjool.model.Order;
 import com.example.medjool.model.Product;
 import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ProductRepository;
-import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
