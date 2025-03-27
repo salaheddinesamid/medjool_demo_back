@@ -35,6 +35,9 @@ public class Order {
     @Column(name = "packaging")
     Float packaging;
 
+    @Column(name = "total_weight")
+    private Long totalWeight;
+
     @Column(name = "total_price", nullable = false)
     private Double totalPrice;
 

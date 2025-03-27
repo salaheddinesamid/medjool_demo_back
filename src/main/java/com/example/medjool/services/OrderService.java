@@ -11,6 +11,7 @@ import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -71,6 +72,9 @@ public class OrderService {
             order.setOrderDate(localDate);
             order.setClient(client);
             order.setTotalPrice(orderDto.getTotalPrice());
+            order.setNumberOfPallets(orderDto.getNumPallets());
+            order.setPackaging(orderDto.getPackaging());
+            order.setTotalWeight(orderDto.getTotalWeight());
             order.setStatus("PRELIMINARY");
             orderRepository.save(order);
 
@@ -99,6 +103,22 @@ public class OrderService {
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
+    }
+
+
+    public ResponseEntity<Object> cancelOrders(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (!order.getStatus().equals("IN PRODUCTION")) {
+            Product product = order.getProduct();
+            product.setTotalWeight(
+                product.getTotalWeight() + order.getTotalWeight()
+            );
+
+            orderRepository.delete(order);
+            return new ResponseEntity<>("Order is canceled.", HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>("This order can not be canceled.", HttpStatus.CONFLICT);
+        }
     }
 
 }

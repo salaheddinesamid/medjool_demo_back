@@ -8,9 +8,9 @@ public class OrderDto {
     String clientName;
     ShippingDetailsDto shippingDetails;
     Integer productId;
-    Float totalWeight;
+    Long totalWeight;
     Double totalPrice;
     Float packaging;
-    Integer numberOfPallets;
+    Integer numPallets;
 
 }

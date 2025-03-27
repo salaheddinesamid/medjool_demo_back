@@ -37,4 +37,10 @@ public class OrderController {
 
         return orderService.updateOrderStatus(orderId, newStatus);
     }
+
+
+    @DeleteMapping("cancel/{orderId}")
+    public ResponseEntity<?> cancelOrder(@PathVariable Long orderId){
+        return orderService.cancelOrders(orderId);
+    }
 }
