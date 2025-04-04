@@ -1,5 +1,8 @@
 package com.example.medjool.services;
+import com.example.medjool.dto.OrderResponseDto;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 
 @Service
@@ -34,6 +37,13 @@ public class PdfGenerator {
         }
     }
     
+     */
+
+    /*
+    public byte[] generateOrderPdf(OrderResponseDto orderResponseDto) throws IOException {
+
+    }
+
      */
 
 }

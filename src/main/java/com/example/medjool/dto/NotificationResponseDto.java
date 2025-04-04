@@ -1,6 +1,5 @@
 package com.example.medjool.dto;
 
-import com.example.medjool.model.Alert;
 import com.example.medjool.model.Notification;
 import lombok.Data;
 

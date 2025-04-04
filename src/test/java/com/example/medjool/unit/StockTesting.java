@@ -33,7 +33,7 @@ public class StockTesting {
     @Test
     void getAllProducts() {
         ResponseEntity<OverviewDto> overview = overviewService.getOverview();
-        Float totalStockWeight = Objects.requireNonNull(overview.getBody()).getTotalStock();
+        Double totalStockWeight = Objects.requireNonNull(overview.getBody()).getTotalStock();
         assertEquals(totalStockWeight, 21835 );
     }
 }

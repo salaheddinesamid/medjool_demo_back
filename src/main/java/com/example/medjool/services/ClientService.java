@@ -2,6 +2,7 @@ package com.example.medjool.services;
 
 import com.example.medjool.dto.AddressDto;
 import com.example.medjool.dto.ClientDto;
+import com.example.medjool.dto.ContactDto;
 import com.example.medjool.model.Address;
 import com.example.medjool.model.Client;
 import com.example.medjool.model.Contact;
@@ -30,59 +31,11 @@ public class ClientService {
         this.contactRepository = contactRepository;
     }
 
-    // Return all clients:
-    public List<Client> getAllClients(){
-        return clientRepository.findAll();
-    }
 
-
-    // Add new client:
-    public ResponseEntity<Object> addClient(ClientDto clientDto) {
-        Client client = new Client();
-        List<Address> clientAddresses = new ArrayList<>();
-        List<Contact> clientContacts = new ArrayList<>();
-
-        // Create and save Addresses properly
-        for (AddressDto addressDto : clientDto.getAddressDtoList()) {
-            Address address = new Address(); // Create a NEW instance for each address
-            address.setCity(addressDto.getCity());
-            address.setCountry(addressDto.getCountry());
-            address.setStreet(addressDto.getStreet());
-            address.setState(addressDto.getState());
-            address.setPostalCode(addressDto.getPostalCode());
-
-            // Save the address
-            address = addressRepository.save(address);
-            clientAddresses.add(address);
-        }
-
-        // Create and save Contact
-        Contact contact = new Contact();
-        contact.setEmail(clientDto.getEmail());
-        contact.setPhone(clientDto.getPhone());
-
-        contact = contactRepository.save(contact);
-        clientContacts.add(contact);
-
-        // Set Client details
-        client.setCompanyName(clientDto.getNameOfCompany());
-        client.setAddresses(clientAddresses);
-        client.setContacts(clientContacts);
-        client.setCompanyActivity(clientDto.getCompanyActivity());
-        client.setGeneralManager(clientDto.getNameOfGeneralManager());
-
-        // Save the client
-        clientRepository.save(client);
-
-        return new ResponseEntity<>(client, HttpStatus.CREATED);
-    }
-
-    public ResponseEntity<List<Client>> getAll(){
-        List<Client> clients = clientRepository.findAll();
-        return new ResponseEntity<>(clients,HttpStatus.OK);
-    }
 
     // Update client information:
+
+    /* To be updated:
     public ResponseEntity<Client> updateClient(Integer clientId,ClientDto updatedClientDto) {
 
         Client client = clientRepository.findByCompanyName(
@@ -110,6 +63,9 @@ public class ClientService {
         }
         return new ResponseEntity<>(client, HttpStatus.OK);
     }
+
+
+     */
 
     // Delete a client:
     public ResponseEntity<Object> deleteClient(Integer clientId) {

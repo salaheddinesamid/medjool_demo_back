@@ -13,6 +13,9 @@ public class Contact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer contactId;
 
+    @Column(name = "department")
+    private String department;
+
     @Column(name = "email")
     private String email;
 

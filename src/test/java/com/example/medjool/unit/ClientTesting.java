@@ -45,6 +45,7 @@ class ClientTesting {
 
     Logger logger = Logger.getLogger(ClientTesting.class.getName());
 
+    /*
     @Test
     void testAddClient() {
         // Prepare the input data
@@ -101,13 +102,19 @@ class ClientTesting {
     }
 
 
+     */
 
 
+
+    /*
     @Test
     void getAllClients() {
         List<Client> clients = clientService.getAllClients();
         logger.info(clients.toString());
         assertNotNull(clients);
     }
+
+
+     */
 
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 public class OverviewDto
 {
 
-    Float totalStock;
+    Double totalStock;
     Long totalOrders;
     Long totalReceivedOrders;
     Float totalRevenue;

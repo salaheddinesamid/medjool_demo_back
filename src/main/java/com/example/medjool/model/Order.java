@@ -1,57 +1,40 @@
 package com.example.medjool.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @Table(name = "orders")
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false) // Ensures foreign key constraint
+    @ManyToOne(fetch = FetchType.LAZY)
     private Client client;
 
-    @ManyToOne
-    Product product;
-
-    private LocalDate orderDate;
-
-
-    @Column(name = "number_of_pallets")
-    Integer numberOfPallets;
-
-    @Column(name = "packaging")
-    Float packaging;
-
-    @Column(name = "total_weight")
-    private Long totalWeight;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(name = "total_price", nullable = false)
-    private Double totalPrice;
+    private double totalPrice;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Column(name = "total_weight", nullable = false)
+    private double totalWeight;
 
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", client=" + (client != null ? client.getCompanyName() : "N/A") +
-                ", orderDate='" + orderDate + '\'' +
-                ", totalPrice=" + totalPrice +
-                ", status='" + status + '\'' +
-                '}';
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status;
+
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
     }
 }

@@ -1,4 +1,4 @@
 package com.example.medjool.exception;
 
-public class ProductLowStock {
+public class ProductLowStock extends RuntimeException {
 }

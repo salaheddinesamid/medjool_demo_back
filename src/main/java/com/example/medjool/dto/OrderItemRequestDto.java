@@ -1,4 +1,19 @@
 package com.example.medjool.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class OrderItemRequestDto {
+
+    private Long productId;
+
+    private double pricePerKg;
+
+    private double packaging;
+
+    private int numberOfPallets;
+
+    private double itemWeight;
 }

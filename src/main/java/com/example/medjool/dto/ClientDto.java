@@ -7,11 +7,11 @@ import java.util.List;
 
 @Data
 public class ClientDto {
-    private String nameOfCompany;
-    private String nameOfGeneralManager;
+    private String companyName;
+    private String generalManager;
     private String companyActivity;
-    private String email;
-    private String phone;
-    private List<AddressDto> addressDtoList;
+    private String website;
+    private List<ContactDto> contacts;
+    private List<AddressDto> addresses;
     private String status;
 }

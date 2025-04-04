@@ -33,6 +33,11 @@ public class PalletService {
                 palletDto.getNumberOfCartonsInStory()
         );
 
+        // Dimensions:
+        pallet.setX(palletDto.getX());
+        pallet.setY(palletDto.getY());
+
+
         pallet.setPackaging(palletDto.getPackaging());
         pallet.setTag(palletDto.getTag());
         palletRepository.save(pallet);

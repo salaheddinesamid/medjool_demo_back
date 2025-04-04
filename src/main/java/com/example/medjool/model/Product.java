@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -11,7 +13,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer productId;
+    private Long productId;
 
     @Column(nullable = false)
     private String brand;
@@ -19,11 +21,9 @@ public class Product {
     @Column(nullable = false)
     private String callibre;
 
-    @Column(name = "price_per_kg", nullable = false)
-    private Float pricePerKg;
 
     @Column(name = "total_weight", nullable = false)
-    private Float totalWeight;
+    private Double totalWeight;
 
     @Column(nullable = false)
     private String color;
@@ -37,6 +37,9 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductStatus status;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems;
 
     @PrePersist
     @PreUpdate

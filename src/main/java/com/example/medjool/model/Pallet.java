@@ -11,23 +11,28 @@ public class Pallet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer palletId;
+    private Integer palletId;
 
     @Column(name = "packaging")
-    String packaging;
+    private String packaging;
 
     @Column(name = "number_of_boxes_in_carton")
-    Integer numberOfBoxesInCarton;
+    private Integer numberOfBoxesInCarton;
 
     @Column(name = "number_of_cartons_in_story")
-    Integer numberOfCartonsInStory;
+    private Integer numberOfCartonsInStory;
 
     @Column(name = "number_of_stories_in_pallet")
-    Integer numberOfStoriesInPallet;
+    private Integer numberOfStoriesInPallet;
 
     @Column(name = "total_net")
-    Float totalNet;
+    private Float totalNet;
 
+    @Column(name = "x")
+    private Float x;
+
+    @Column(name = "y")
+    private Float y;
 
     @Column(name = "tag")
     String tag;

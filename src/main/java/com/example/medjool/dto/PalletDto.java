@@ -10,6 +10,8 @@ public class PalletDto {
     Integer numberOfBoxesInCarton;
     Integer numberOfCartonsInStory;
     Integer numberOfStoriesInPallet;
+    Float x;
+    Float y;
     Float totalNet;
     String tag;
 }

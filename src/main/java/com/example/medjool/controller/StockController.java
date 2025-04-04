@@ -1,6 +1,7 @@
 package com.example.medjool.controller;
 
 import com.example.medjool.dto.OverviewDto;
+import com.example.medjool.dto.ProductResponseDto;
 import com.example.medjool.model.Product;
 import com.example.medjool.services.OverviewService;
 import com.example.medjool.services.StockService;
@@ -26,8 +27,8 @@ public class StockController {
 
 
     @GetMapping("get_all")
-    public ResponseEntity<List<Product>> getAll() {
-        List<Product> allProducts = stockService.getAllProducts();
+    public ResponseEntity<List<ProductResponseDto>> getAll() {
+        List<ProductResponseDto> allProducts = stockService.getAllProducts();
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }
 

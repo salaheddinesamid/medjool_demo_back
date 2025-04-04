@@ -1,5 +1,6 @@
 package com.example.medjool.services;
 
+import com.example.medjool.dto.ProductResponseDto;
 import com.example.medjool.model.Product;
 import com.example.medjool.repository.ProductRepository;
 import org.apache.commons.csv.CSVFormat;
@@ -15,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StockService {
@@ -26,13 +28,17 @@ public class StockService {
         this.productRepository = productRepository;
     }
 
-    public Product getProduct(Integer productId){
+    public Product getProduct(Long productId){
         return productRepository.findById(productId).get();
     }
 
 
-    public List<Product> getAllProducts(){
-        return productRepository.findAll();
+    public List<ProductResponseDto> getAllProducts(){
+        List<Product> products = productRepository.findAll();
+
+        List<ProductResponseDto> productResponseDtos =
+                products.stream().map(product -> new ProductResponseDto(product)).collect(Collectors.toList());
+        return productResponseDtos;
     }
 
 
@@ -45,8 +51,8 @@ public class StockService {
         CSVParser csvParser = new CSVParser(bufferedReader, CSVFormat.DEFAULT);
 
         for (CSVRecord record : csvParser) {
-            Product product = productRepository.findById(Integer.valueOf(record.get("product_id"))).get();
-            product.setTotalWeight(Float.valueOf(record.get("New weight")));
+            Product product = productRepository.findById(Long.valueOf(record.get("product_id"))).get();
+            product.setTotalWeight(Double.valueOf(record.get("New weight")));
             productRepository.save(product);
         }
         return new ResponseEntity<>(HttpStatus.OK);
