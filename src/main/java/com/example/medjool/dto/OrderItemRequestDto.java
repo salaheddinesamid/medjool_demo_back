@@ -7,7 +7,11 @@ import lombok.Setter;
 @Setter
 public class OrderItemRequestDto {
 
-    private Long productId;
+    private String callibre;
+
+    private String color;
+
+    private String quality;
 
     private double pricePerKg;
 
