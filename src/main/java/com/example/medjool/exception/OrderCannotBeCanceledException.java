@@ -1,4 +1,4 @@
 package com.example.medjool.exception;
 
-public class OrderCannotBeCanceledException {
+public class OrderCannotBeCanceledException extends RuntimeException {
 }
