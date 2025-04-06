@@ -28,12 +28,12 @@ public class Pallet {
     @Column(name = "total_net")
     private Float totalNet;
 
-    @Column(name = "x")
-    private Float x;
-
-    @Column(name = "y")
-    private Float y;
+    @Column(name = "dimensions")
+    private String dimensions;
 
     @Column(name = "tag")
-    String tag;
+    private String tag;
+
+    @Column(name = "notes")
+    private String notes;
 }
