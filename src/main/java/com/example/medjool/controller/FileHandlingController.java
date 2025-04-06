@@ -1,9 +1,6 @@
 package com.example.medjool.controller;
-
-/**
 import com.example.medjool.services.FileHandling;
-import com.example.medjool.services.ParseCSV;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,14 +9,19 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("api/file/")
 public class FileHandlingController {
     private final FileHandling fileHandling;
-    private final ParseCSV parseCSV;
 
-    public FileHandlingController(FileHandling fileHandling, ParseCSV parseCSV) {
+    public FileHandlingController(FileHandling fileHandling) {
         this.fileHandling = fileHandling;
-        this.parseCSV = parseCSV;
+
     }
 
 
+    // Upload order details PDF:
+    public ResponseEntity<Object> uploadOrderPDF(MultipartFile file) {
+        return new ResponseEntity<>("Uploading file", HttpStatus.OK);
+    }
+
+    /*
     @PostMapping(value = "stock/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateStock(@RequestParam("file")MultipartFile multipartFile){
 
@@ -30,5 +32,7 @@ public class FileHandlingController {
         return parseCSV.parseCSV(multipartFile);
     }
 
+
+     */
+
 }
-**/

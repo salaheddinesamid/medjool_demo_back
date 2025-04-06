@@ -4,6 +4,7 @@ import com.example.medjool.dto.OrderItemRequestDto;
 import com.example.medjool.dto.OrderRequestDto;
 import com.example.medjool.dto.OrderResponseDto;
 import com.example.medjool.dto.OrderStatusDto;
+import com.example.medjool.exception.ProductNotFoundException;
 import com.example.medjool.model.*;
 import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.OrderRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +25,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final ClientRepository clientRepository;
+
+    Logger logger = Logger.getLogger(OrderService.class.getName());
 
     @Transactional
     public OrderResponseDto createOrder(OrderRequestDto orderRequest) {
@@ -40,16 +44,22 @@ public class OrderService {
         // Initiate the total weight:
         double totalWeight = 0;
 
+
+        logger.info("New Order is being processed...");
         // Iterate over each order item
         for (OrderItemRequestDto itemRequest : orderRequest.getItems()) {
-            Product product = productRepository.findById(itemRequest.getProductId()).orElse(null);
+            Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getCallibre(),itemRequest.getColor(),itemRequest.getQuality());
 
             // Skip if product not found or insufficient stock
-            if (product == null || product.getTotalWeight() < itemRequest.getItemWeight()) {
-                continue;
+            if (product == null){
+                throw new ProductNotFoundException();
             }
-
+            else if (product.getTotalWeight() < itemRequest.getItemWeight()){
+                throw new ProductNotFoundException();
+            }
             // Update product inventory
+
+            logger.info("The product with id : " + product.getProductId() + "is being updated...");
             product.setTotalWeight(product.getTotalWeight() - itemRequest.getItemWeight());
             productRepository.save(product);
 
@@ -73,6 +83,7 @@ public class OrderService {
         if (!order.getOrderItems().isEmpty()) {
             order.setTotalPrice(totalPrice);
             order.setTotalWeight(totalWeight);
+            order.setStatus(OrderStatus.valueOf("PRELIMINARY"));
             Order savedOrder = orderRepository.save(order);
             return new OrderResponseDto(savedOrder);
         }

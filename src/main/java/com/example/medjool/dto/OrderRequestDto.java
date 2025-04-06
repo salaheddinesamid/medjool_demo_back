@@ -9,6 +9,6 @@ import java.util.List;
 @Setter
 public class OrderRequestDto {
     private String clientName;
-
     private List<OrderItemRequestDto> items;
+    private  ShippingDetailsDto shippingDetails;
 }

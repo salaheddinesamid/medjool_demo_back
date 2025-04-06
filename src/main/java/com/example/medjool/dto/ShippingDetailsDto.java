@@ -8,5 +8,5 @@ public class ShippingDetailsDto {
 
     String transportType;
     String incoterm;
-    String address;
+    Long addressId;
 }

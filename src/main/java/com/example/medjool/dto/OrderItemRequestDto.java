@@ -20,4 +20,7 @@ public class OrderItemRequestDto {
     private int numberOfPallets;
 
     private double itemWeight;
+
+    private Long palletId;
+
 }

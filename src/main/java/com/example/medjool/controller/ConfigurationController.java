@@ -1,6 +1,7 @@
 package com.example.medjool.controller;
 
 
+import com.example.medjool.dto.AddressResponseDto;
 import com.example.medjool.dto.ClientDto;
 import com.example.medjool.dto.PalletDto;
 import com.example.medjool.model.Client;
@@ -33,15 +34,30 @@ public class ConfigurationController {
         return configurationService.getAll();
     }
 
+    @GetMapping("client/addresses/{clientId}")
+    public ResponseEntity<List<AddressResponseDto>> getClientAddresses(@PathVariable Integer clientId) {
+        return configurationService.getClientAddresses(clientId);
+    }
+
     // ----- Pallet Configuration: ------------------//
 
-    @PostMapping("/new")
+    @PostMapping("pallet/new")
     public ResponseEntity<Object> newPallet(@RequestBody PalletDto palletDto) {
         return configurationService.addPallet(palletDto);
     }
 
-    @PostMapping("/get_all")
+    @GetMapping("pallet/get_all")
     public ResponseEntity<List<Pallet>> getAllPallet() {
         return configurationService.getAllPallets();
     }
+
+    @GetMapping("pallet/get_by_packaging/{packaging}")
+    public ResponseEntity<List<Pallet>> getPalletByPackaging(
+            @PathVariable String packaging
+    ) {
+        return configurationService.getAllPalletsByPackaging(packaging);
+    }
+
+
+
 }

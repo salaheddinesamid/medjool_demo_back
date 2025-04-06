@@ -1,9 +1,6 @@
 package com.example.medjool.services;
 
-import com.example.medjool.dto.AddressDto;
-import com.example.medjool.dto.ClientDto;
-import com.example.medjool.dto.ContactDto;
-import com.example.medjool.dto.PalletDto;
+import com.example.medjool.dto.*;
 import com.example.medjool.model.Address;
 import com.example.medjool.model.Client;
 import com.example.medjool.model.Contact;
@@ -87,7 +84,25 @@ public class ConfigurationService {
         return new ResponseEntity<>(clients,HttpStatus.OK);
     }
 
+    public ResponseEntity<List<AddressResponseDto>> getClientAddresses(Integer id){
+        List<Address> addresses = clientRepository.findById(id).get().getAddresses();
 
+        List<AddressResponseDto> addressResponseDtos =
+                addresses.stream().map(address -> {
+                    AddressResponseDto addressResponseDto = new AddressResponseDto();
+                    addressResponseDto.setCity(address.getCity());
+                    addressResponseDto.setCountry(address.getCountry());
+                    addressResponseDto.setStreet(address.getStreet());
+                    addressResponseDto.setState(address.getState());
+                    return addressResponseDto;
+                }).toList();
+
+        return new ResponseEntity<>(addressResponseDtos,HttpStatus.OK);
+    }
+
+
+
+    // -------------------------- Pallet Configuration Service ---------------------------
     public ResponseEntity<Object> addPallet(PalletDto palletDto) {
 
         Pallet pallet = new Pallet();
@@ -103,8 +118,9 @@ public class ConfigurationService {
         );
 
         // Dimensions:
-        pallet.setX(palletDto.getX());
-        pallet.setY(palletDto.getY());
+        pallet.setDimensions(
+                palletDto.getDimensions()
+        );
 
 
         pallet.setPackaging(palletDto.getPackaging());
@@ -115,8 +131,18 @@ public class ConfigurationService {
     }
 
 
+
+
     public ResponseEntity<List<Pallet>> getAllPallets(){
         List<Pallet> pallets = palletRepository.findAll();
+        return ResponseEntity.ok().body(pallets);
+    }
+
+    public ResponseEntity<List<Pallet>> getAllPalletsByPackaging(String packaging) {
+        List<Pallet> pallets = palletRepository.findAllByPackaging(
+                packaging
+        );
+
         return ResponseEntity.ok().body(pallets);
     }
 }
