@@ -4,10 +4,12 @@ import com.example.medjool.dto.OrderItemRequestDto;
 import com.example.medjool.dto.OrderRequestDto;
 import com.example.medjool.dto.OrderResponseDto;
 import com.example.medjool.dto.OrderStatusDto;
+import com.example.medjool.exception.ProductLowStock;
 import com.example.medjool.exception.ProductNotFoundException;
 import com.example.medjool.model.*;
 import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.OrderRepository;
+import com.example.medjool.repository.PalletRepository;
 import com.example.medjool.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -25,6 +29,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final ClientRepository clientRepository;
+    private final PalletRepository palletRepository;
 
     Logger logger = Logger.getLogger(OrderService.class.getName());
 
@@ -33,6 +38,7 @@ public class OrderService {
 
         // Create new order object
         Order order = new Order();
+        LocalDate orderDate = LocalDate.now();
 
         // Find the corresponding client
         Client client = clientRepository.findByCompanyName(orderRequest.getClientName());
@@ -50,12 +56,13 @@ public class OrderService {
         for (OrderItemRequestDto itemRequest : orderRequest.getItems()) {
             Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getCallibre(),itemRequest.getColor(),itemRequest.getQuality());
 
+            Optional<Pallet> pallet = palletRepository.findById(itemRequest.getPalletId());
             // Skip if product not found or insufficient stock
             if (product == null){
                 throw new ProductNotFoundException();
             }
             else if (product.getTotalWeight() < itemRequest.getItemWeight()){
-                throw new ProductNotFoundException();
+                throw new ProductLowStock();
             }
             // Update product inventory
 
@@ -70,6 +77,7 @@ public class OrderService {
             orderItem.setPackaging(itemRequest.getPackaging());
             orderItem.setNumberOfPallets(itemRequest.getNumberOfPallets());
             orderItem.setItemWeight(itemRequest.getItemWeight());
+            orderItem.setPallet(pallet.get());
 
             // Calculate totals
             double itemPrice = itemRequest.getPricePerKg() * itemRequest.getItemWeight();
@@ -84,6 +92,7 @@ public class OrderService {
             order.setTotalPrice(totalPrice);
             order.setTotalWeight(totalWeight);
             order.setStatus(OrderStatus.valueOf("PRELIMINARY"));
+            order.setDate(orderDate);
             Order savedOrder = orderRepository.save(order);
             return new OrderResponseDto(savedOrder);
         }
@@ -105,6 +114,9 @@ public class OrderService {
                 .orElse(null);
     }
 
+
+
+    @Transactional
     public ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto){
         Order order = orderRepository.findById(id).orElse(null);
         if (order == null) {
@@ -116,19 +128,29 @@ public class OrderService {
         return ResponseEntity.ok().build();
     }
 
+    @Transactional
     public ResponseEntity<Object> cancelOrder(Long id) {
         Order order = orderRepository.findById(id).orElse(null);
 
         if (order == null) {
             return ResponseEntity.notFound().build();
         }
-        else if (order.getStatus().toString().equals("IN_PRODUCTION")){
-            return new ResponseEntity<>("Order is already in production and can not be canceled at the moment...", HttpStatus.CONFLICT);
+
+        if (order.getStatus() == OrderStatus.IN_PRODUCTION) {
+            return new ResponseEntity<>("Order is already in production and cannot be canceled at the moment...", HttpStatus.CONFLICT);
         }
 
-        order.setStatus(OrderStatus.valueOf("CANCELLED"));
-        orderRepository.save(order);
+        for (OrderItem orderItem : order.getOrderItems()) {
+            Product product = orderItem.getProduct();
+            // Assuming getWeight() or quantity is the correct field to restore stock
+            product.setTotalWeight(product.getTotalWeight() + orderItem.getItemWeight());
+            // No need to call productRepository.save(product); if within @Transactional and managed context
+        }
+
+        order.setStatus(OrderStatus.CANCELED);
+        // No need to call orderRepository.save(order); for same reason
 
         return new ResponseEntity<>("Order has been cancelled.", HttpStatus.OK);
     }
+
 }

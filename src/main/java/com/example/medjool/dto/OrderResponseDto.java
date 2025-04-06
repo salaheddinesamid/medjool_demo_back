@@ -4,6 +4,7 @@ import com.example.medjool.model.Order;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -15,6 +16,7 @@ public class OrderResponseDto {
     private double totalWeight;
     private String status;
     private List<OrderItemResponseDto> items;
+    private LocalDate orderDate;
 
     public OrderResponseDto(Order order) {
         this.id = order.getId();
