@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,9 @@ public class Order {
 
     @Column(name = "total_weight", nullable = false)
     private double totalWeight;
+
+    @Column(name = "date")
+    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
