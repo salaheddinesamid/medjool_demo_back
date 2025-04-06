@@ -21,6 +21,6 @@ public class OrderItemRequestDto {
 
     private double itemWeight;
 
-    private Long palletId;
+    private Integer palletId;
 
 }
