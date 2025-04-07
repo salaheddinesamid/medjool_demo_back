@@ -14,7 +14,7 @@ public class Pallet {
     private Integer palletId;
 
     @Column(name = "packaging")
-    private String packaging;
+    private float packaging;
 
     @Column(name = "number_of_boxes_in_carton")
     private Integer numberOfBoxesInCarton;
