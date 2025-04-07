@@ -2,7 +2,7 @@ package com.example.medjool.controller;
 
 
 import com.example.medjool.dto.NotificationResponseDto;
-import com.example.medjool.services.AlertService;
+import com.example.medjool.services.implementation.AlertServiceImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,9 +10,9 @@ import java.util.List;
 @RestController
 @RequestMapping("api/alert")
 public class AlertController {
-    private final AlertService alertService;
+    private final AlertServiceImpl alertService;
 
-    public AlertController(AlertService alertService) {
+    public AlertController(AlertServiceImpl alertService) {
         this.alertService = alertService;
     }
 

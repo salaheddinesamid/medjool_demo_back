@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface PalletRepository extends JpaRepository<Pallet, Integer> {
 
-    List<Pallet> findAllByPackaging(String packaging);
+    List<Pallet> findAllByPackaging(float packaging);
 }

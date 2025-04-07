@@ -5,6 +5,8 @@ import com.example.medjool.dto.ProductResponseDto;
 import com.example.medjool.model.Product;
 import com.example.medjool.services.OverviewService;
 import com.example.medjool.services.StockService;
+import com.example.medjool.services.implementation.OverviewServiceImpl;
+import com.example.medjool.services.implementation.StockServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +18,12 @@ import java.util.List;
 @RequestMapping("api/stock/")
 public class StockController {
 
-    private final StockService stockService;
-    private final OverviewService overviewService;
+    private final StockServiceImpl stockService;
+    private final OverviewServiceImpl overviewService;
 
     @Autowired
-    public StockController(StockService stockService, OverviewService overviewService) {
+    public StockController(StockServiceImpl stockService,
+                           OverviewServiceImpl overviewService) {
         this.stockService = stockService;
         this.overviewService = overviewService;
     }

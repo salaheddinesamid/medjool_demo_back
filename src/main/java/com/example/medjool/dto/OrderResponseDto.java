@@ -27,5 +27,6 @@ public class OrderResponseDto {
         this.items = order.getOrderItems().stream()
                 .map(OrderItemResponseDto::new)
                 .toList();
+        this.orderDate = order.getDate();
     }
 }

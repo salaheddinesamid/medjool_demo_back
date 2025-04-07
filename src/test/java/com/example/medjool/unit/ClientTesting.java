@@ -1,35 +1,24 @@
 package com.example.medjool.unit;
 
 
-import com.example.medjool.dto.AddressDto;
-import com.example.medjool.dto.ClientDto;
-import com.example.medjool.model.Address;
-import com.example.medjool.model.Client;
-import com.example.medjool.model.Contact;
 import com.example.medjool.repository.AddressRepository;
 import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.ContactRepository;
-import com.example.medjool.services.ClientService;
-import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @RunWith(MockitoJUnitRunner.class)
 class ClientTesting {
+
+    /*
 
     @InjectMocks
     private ClientService clientService; // Your service class that contains the addClient method

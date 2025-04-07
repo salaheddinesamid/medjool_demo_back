@@ -4,7 +4,7 @@ import com.example.medjool.dto.OrderRequestDto;
 import com.example.medjool.dto.OrderResponseDto;
 
 import com.example.medjool.dto.OrderStatusDto;
-import com.example.medjool.services.OrderService;
+import com.example.medjool.services.implementation.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
@@ -16,10 +16,10 @@ import java.util.List;
 @RequestMapping("api/order")
 public class OrderController {
 
-    private final OrderService orderService;
+    private final OrderServiceImpl orderService;
 
     @Autowired
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderServiceImpl orderService) {
         this.orderService = orderService;
     }
 

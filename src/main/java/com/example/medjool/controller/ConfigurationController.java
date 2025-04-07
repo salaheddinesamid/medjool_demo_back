@@ -6,7 +6,7 @@ import com.example.medjool.dto.ClientDto;
 import com.example.medjool.dto.PalletDto;
 import com.example.medjool.model.Client;
 import com.example.medjool.model.Pallet;
-import com.example.medjool.services.ConfigurationService;
+import com.example.medjool.services.implementation.ConfigurationServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +16,9 @@ import java.util.List;
 @RequestMapping("/api/configuration")
 public class ConfigurationController {
 
-    private final ConfigurationService configurationService;
+    private final ConfigurationServiceImpl configurationService;
 
-    public ConfigurationController(ConfigurationService configurationService) {
+    public ConfigurationController(ConfigurationServiceImpl configurationService) {
         this.configurationService = configurationService;
     }
 
@@ -53,7 +53,7 @@ public class ConfigurationController {
 
     @GetMapping("pallet/get_by_packaging/{packaging}")
     public ResponseEntity<List<Pallet>> getPalletByPackaging(
-            @PathVariable String packaging
+            @PathVariable float packaging
     ) {
         return configurationService.getAllPalletsByPackaging(packaging);
     }
