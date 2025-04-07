@@ -34,9 +34,22 @@ public class ConfigurationController {
         return configurationService.getAll();
     }
 
+    @DeleteMapping("client/delete/{clientId}")
+    public ResponseEntity<Object> deleteClient(@PathVariable Integer clientId) throws ClassNotFoundException {
+        return configurationService.deleteClient(clientId);
+    }
+
+    /*
     @GetMapping("client/addresses/{clientId}")
     public ResponseEntity<List<AddressResponseDto>> getClientAddresses(@PathVariable Integer clientId) {
         return configurationService.getClientAddresses(clientId);
+    }
+
+     */
+
+    @GetMapping("client/addresses/{clientName}")
+    public ResponseEntity<List<AddressResponseDto>> getClientAddressesByName(@PathVariable String clientName) {
+        return configurationService.getClientAddressesByClientName(clientName);
     }
 
     // ----- Pallet Configuration: ------------------//
@@ -56,6 +69,11 @@ public class ConfigurationController {
             @PathVariable float packaging
     ) {
         return configurationService.getAllPalletsByPackaging(packaging);
+    }
+
+    @DeleteMapping("pallet/delete/{palletId}")
+    public ResponseEntity<Object> deletePallet(@PathVariable Integer palletId) {
+        return configurationService.deletePallet(palletId);
     }
 
 

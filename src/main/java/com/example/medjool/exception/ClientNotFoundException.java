@@ -1,4 +1,4 @@
 package com.example.medjool.exception;
 
-public class ClientNotFoundException {
+public class ClientNotFoundException extends RuntimeException {
 }

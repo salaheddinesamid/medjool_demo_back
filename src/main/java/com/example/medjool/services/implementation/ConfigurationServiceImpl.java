@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ConfigurationServiceImpl implements ConfigurationService {
@@ -80,6 +81,19 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
+    public ResponseEntity<Object> deleteClient(Integer id) throws ClassNotFoundException {
+        Optional<Client> client = clientRepository.findById(id);
+
+
+        if (client.isEmpty()) {
+            throw new ClassNotFoundException();
+        }
+        clientRepository.delete(client.get());
+        return new ResponseEntity<>(client, HttpStatus.OK);
+    }
+
+
+    @Override
     public ResponseEntity<List<AddressResponseDto>> getClientAddresses(Integer id){
         List<Address> addresses = clientRepository.findById(id).get().getAddresses();
 
@@ -96,6 +110,22 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return new ResponseEntity<>(addressResponseDtos,HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<List<AddressResponseDto>> getClientAddressesByClientName(String clientName) {
+        List<Address> addresses = clientRepository.findByCompanyName(clientName).getAddresses();
+
+        List<AddressResponseDto> addressResponseDtos =
+                addresses.stream().map(address -> {
+                    AddressResponseDto addressResponseDto = new AddressResponseDto();
+                    addressResponseDto.setCity(address.getCity());
+                    addressResponseDto.setCountry(address.getCountry());
+                    addressResponseDto.setStreet(address.getStreet());
+                    addressResponseDto.setState(address.getState());
+                    return addressResponseDto;
+                }).toList();
+
+        return new ResponseEntity<>(addressResponseDtos,HttpStatus.OK);
+    }
 
 
     // -------------------------- Pallet Configuration Service ---------------------------
@@ -140,5 +170,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         );
 
         return ResponseEntity.ok().body(pallets);
+    }
+
+
+    public ResponseEntity<Object> deletePallet(Integer palletId) {
+        Pallet pallet = palletRepository.findById(palletId).orElseThrow(null);
+        palletRepository.delete(pallet);
+        return ResponseEntity.ok().body(pallet);
     }
 }

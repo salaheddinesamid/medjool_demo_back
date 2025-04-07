@@ -4,7 +4,7 @@ public enum OrderStatus {
 
     PRELIMINARY,
     CONFIRMED,
-    SENT_PRODUCTION,
+    SENT_TO_PRODUCTION,
     IN_PRODUCTION,
     READY_TO_SHIPPED,
     SHIPPED,
