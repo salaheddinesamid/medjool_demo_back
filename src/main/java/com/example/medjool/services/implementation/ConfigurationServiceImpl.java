@@ -92,12 +92,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return new ResponseEntity<>(client, HttpStatus.OK);
     }
 
-
-    @Override
-    public ResponseEntity<List<AddressResponseDto>> getClientAddresses(Integer id){
-        List<Address> addresses = clientRepository.findById(id).get().getAddresses();
-
-        List<AddressResponseDto> addressResponseDtos =
+    private List<AddressResponseDto> convertToAddressDto(List<Address> addresses) {
+        return
                 addresses.stream().map(address -> {
                     AddressResponseDto addressResponseDto = new AddressResponseDto();
                     addressResponseDto.setCity(address.getCity());
@@ -106,6 +102,15 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                     addressResponseDto.setState(address.getState());
                     return addressResponseDto;
                 }).toList();
+    }
+
+
+    @Override
+    public ResponseEntity<List<AddressResponseDto>> getClientAddresses(Integer id){
+        List<Address> addresses = clientRepository.findById(id).get().getAddresses();
+
+        List<AddressResponseDto> addressResponseDtos = convertToAddressDto(addresses);
+
 
         return new ResponseEntity<>(addressResponseDtos,HttpStatus.OK);
     }
@@ -115,15 +120,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         List<Address> addresses = clientRepository.findByCompanyName(clientName).getAddresses();
 
         List<AddressResponseDto> addressResponseDtos =
-                addresses.stream().map(address -> {
-                    AddressResponseDto addressResponseDto = new AddressResponseDto();
-                    addressResponseDto.setCity(address.getCity());
-                    addressResponseDto.setCountry(address.getCountry());
-                    addressResponseDto.setStreet(address.getStreet());
-                    addressResponseDto.setState(address.getState());
-                    return addressResponseDto;
-                }).toList();
-
+                convertToAddressDto(addresses);
         return new ResponseEntity<>(addressResponseDtos,HttpStatus.OK);
     }
 
