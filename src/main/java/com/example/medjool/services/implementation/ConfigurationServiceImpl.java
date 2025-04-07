@@ -1,4 +1,4 @@
-package com.example.medjool.services;
+package com.example.medjool.services.implementation;
 
 import com.example.medjool.dto.*;
 import com.example.medjool.model.Address;
@@ -9,6 +9,7 @@ import com.example.medjool.repository.AddressRepository;
 import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.ContactRepository;
 import com.example.medjool.repository.PalletRepository;
+import com.example.medjool.services.ConfigurationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ConfigurationServiceImpl implements ConfigurationService{
+public class ConfigurationServiceImpl implements ConfigurationService {
     private final ClientRepository clientRepository;
     private final AddressRepository addressRepository;
     private final ContactRepository contactRepository;
@@ -133,7 +134,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
     }
 
     @Override
-    public ResponseEntity<List<Pallet>> getAllPalletsByPackaging(String packaging) {
+    public ResponseEntity<List<Pallet>> getAllPalletsByPackaging(float packaging) {
         List<Pallet> pallets = palletRepository.findAllByPackaging(
                 packaging
         );
