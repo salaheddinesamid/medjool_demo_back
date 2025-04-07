@@ -35,7 +35,7 @@ public class Order {
     private LocalDate date;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(length = 30) // optional, to avoid truncation for long enum names
     private OrderStatus status;
 
     public void addOrderItem(OrderItem orderItem) {
