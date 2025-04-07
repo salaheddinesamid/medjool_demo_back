@@ -1,4 +1,51 @@
 package com.example.medjool.services.implementation;
 
-public class AlertServiceImpl {
+import com.example.medjool.dto.NotificationResponseDto;
+import com.example.medjool.model.Notification;
+import com.example.medjool.repository.NotificationRepository;
+import com.example.medjool.services.AlertService;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class AlertServiceImpl implements AlertService {
+    private final NotificationRepository notificationRepository;
+
+
+    public AlertServiceImpl(NotificationRepository notificationRepository) {
+        this.notificationRepository = notificationRepository;
+    }
+
+    @Override
+    public void newAlert(String content) {
+        Notification notification = new Notification();
+        LocalDateTime now = LocalDateTime.now();
+        notification.setDate(now);
+        notification.setContent(content);
+        notification.setRead(false);
+        notificationRepository.save(notification);
+    }
+
+
+    @Override
+    public List<NotificationResponseDto> getAllAlerts() {
+        List<Notification> alerts = notificationRepository.findAll();
+        return alerts.stream().map(NotificationResponseDto::new).toList();
+    }
+
+    @Override
+    public void markAllAsRead() {
+        for(Notification notification : notificationRepository.findAll()) {
+            notification.setRead(true);
+            notificationRepository.save(notification);
+            notificationRepository.delete(notification);
+        }
+    }
+
+    @Override
+    public void markAsRead(Long id) {
+        notificationRepository.deleteById(id);
+    }
 }
