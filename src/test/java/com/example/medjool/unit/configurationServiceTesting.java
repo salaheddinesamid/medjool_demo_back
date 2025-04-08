@@ -4,7 +4,6 @@ import com.example.medjool.dto.AddressDto;
 import com.example.medjool.dto.ClientDto;
 import com.example.medjool.dto.ContactDto;
 import com.example.medjool.model.Address;
-import com.example.medjool.model.Client;
 import com.example.medjool.model.Contact;
 import com.example.medjool.repository.AddressRepository;
 import com.example.medjool.repository.ClientRepository;
@@ -14,7 +13,6 @@ import com.example.medjool.services.implementation.ConfigurationServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import static org.assertj.core.api.Assertions.*;
 
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class ConfigurationServiceTesting {
+public class configurationServiceTesting {
 
     @Mock
     private PalletRepository palletRepository;
@@ -77,7 +75,7 @@ public class ConfigurationServiceTesting {
         client.setContacts(contactsDto);
         client.setAddresses(addressesDto);
 
-        
+
 
     }
 }
