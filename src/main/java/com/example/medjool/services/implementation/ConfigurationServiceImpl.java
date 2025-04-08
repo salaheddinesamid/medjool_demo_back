@@ -114,7 +114,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         List<Address> addresses = clientRepository.findById(id).get().getAddresses();
 
         List<AddressResponseDto> addressResponseDtos = convertToAddressDto(addresses);
-        
+
         return new ResponseEntity<>(addressResponseDtos,HttpStatus.OK);
     }
 
