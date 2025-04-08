@@ -1,11 +1,13 @@
 package com.example.medjool.dto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class ClientDto {
     private String companyName;
     private String generalManager;
