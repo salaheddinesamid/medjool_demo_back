@@ -1,13 +1,17 @@
 package com.example.medjool.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "addresses") // Explicit table name
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Address {
 
     @Id
