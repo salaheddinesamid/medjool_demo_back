@@ -33,11 +33,28 @@ public class OrderServiceUnitTest {
     private OrderServiceImpl orderService;
 
 
+
+    // To be completed...
+
+
+
+
     @Test
     public void ensuresOrderIsMadeByActiveClient(){
-        OrderRequestDto orderRequestDto = new OrderRequestDto(
 
-        );
+
+    }
+
+
+    @Test
+    public void ensuresAllOrderItemsAreAvailable(){
+
+    }
+
+
+    @Test
+    public void ensuresInProductionOrdersCanNotBeCancelled(){
+
 
     }
 
