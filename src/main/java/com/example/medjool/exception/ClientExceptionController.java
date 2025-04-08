@@ -14,4 +14,9 @@ public class ClientExceptionController {
     }
 
 
+    @ExceptionHandler(ClientAlreadyFoundException.class)
+    public ResponseEntity<Object> clientAlreadyFound(){
+        return new ResponseEntity<>("Client already exists, can not create duplicate...",HttpStatus.CONFLICT);
+    }
+
 }
