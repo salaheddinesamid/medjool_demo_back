@@ -57,6 +57,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             Contact contact = new Contact();
             contact.setEmail(contactDto.getEmail());
             contact.setPhone(contactDto.getPhone());
+            contact.setDepartment(contactDto.getDepartment());
             contact = contactRepository.save(contact);
             clientContacts.add(contact);
         }
@@ -149,6 +150,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
         pallet.setPackaging(palletDto.getPackaging());
         pallet.setTag(palletDto.getTag());
+
+        pallet.setTotalNet(
+                palletDto.getTotalNet()
+        );
         palletRepository.save(pallet);
 
         return ResponseEntity.ok().body(pallet);
