@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class configurationServiceTesting {
+public class ConfigurationServiceTesting {
 
     @Mock
     private PalletRepository palletRepository;

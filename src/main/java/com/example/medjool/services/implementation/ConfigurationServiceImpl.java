@@ -1,10 +1,8 @@
 package com.example.medjool.services.implementation;
 
 import com.example.medjool.dto.*;
-import com.example.medjool.model.Address;
-import com.example.medjool.model.Client;
-import com.example.medjool.model.Contact;
-import com.example.medjool.model.Pallet;
+import com.example.medjool.exception.ClientAlreadyFoundException;
+import com.example.medjool.model.*;
 import com.example.medjool.repository.AddressRepository;
 import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.ContactRepository;
@@ -34,6 +32,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     // Add new client:
     @Override
     public ResponseEntity<Object> addClient(ClientDto clientDto) {
+
+        if(clientRepository.findByCompanyName(clientDto.getCompanyName())!=null){
+            throw new ClientAlreadyFoundException();
+        }
+
         Client client = new Client();
         List<Address> clientAddresses = new ArrayList<>();
         List<Contact> clientContacts = new ArrayList<>();
@@ -67,7 +70,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         client.setContacts(clientContacts);
         client.setCompanyActivity(clientDto.getCompanyActivity());
         client.setGeneralManager(clientDto.getGeneralManager());
-        client.setStatus(clientDto.getStatus());
+        client.setClientStatus(ClientStatus.valueOf(clientDto.getStatus()));
 
         // Save the client
         clientRepository.save(client);
@@ -111,8 +114,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         List<Address> addresses = clientRepository.findById(id).get().getAddresses();
 
         List<AddressResponseDto> addressResponseDtos = convertToAddressDto(addresses);
-
-
+        
         return new ResponseEntity<>(addressResponseDtos,HttpStatus.OK);
     }
 
