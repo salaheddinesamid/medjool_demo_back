@@ -48,7 +48,7 @@ public class OrderServiceImpl implements OrderService{
 
         // Find the corresponding client
         Client client = clientRepository.findByCompanyName(orderRequest.getClientName());
-        if(client.getClientStatus() != ClientStatus.ACTIVE) {
+        if(!client.getClientStatus().toString().equals("ACTIVE")) {
             throw new ClientNotActiveException();
         }
         order.setClient(client);
@@ -140,6 +140,13 @@ public class OrderServiceImpl implements OrderService{
 
         if(order.getStatus() == OrderStatus.IN_PRODUCTION){
             throw new OrderCannotBeCanceledException();
+        }
+
+        if(orderStatusDto.getNewStatus().equals("CANCELED")){
+            for (OrderItem orderItem : order.getOrderItems()){
+                Product product = orderItem.getProduct();
+                product.setTotalWeight(product.getTotalWeight() + orderItem.getItemWeight());
+            }
         }
         order.setStatus(OrderStatus.valueOf(orderStatusDto.getNewStatus()));
         orderRepository.save(order);
