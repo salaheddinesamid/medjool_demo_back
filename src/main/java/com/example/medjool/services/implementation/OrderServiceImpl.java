@@ -5,6 +5,7 @@ import com.example.medjool.dto.OrderRequestDto;
 import com.example.medjool.dto.OrderResponseDto;
 import com.example.medjool.dto.OrderStatusDto;
 import com.example.medjool.exception.ClientNotActiveException;
+import com.example.medjool.exception.OrderCannotBeCanceledException;
 import com.example.medjool.exception.ProductLowStock;
 import com.example.medjool.exception.ProductNotFoundException;
 import com.example.medjool.model.*;
@@ -135,6 +136,10 @@ public class OrderServiceImpl implements OrderService{
         if (order == null) {
             return ResponseEntity.notFound().build();
 
+        }
+
+        if(order.getStatus() == OrderStatus.IN_PRODUCTION){
+            throw new OrderCannotBeCanceledException();
         }
         order.setStatus(OrderStatus.valueOf(orderStatusDto.getNewStatus()));
         orderRepository.save(order);
