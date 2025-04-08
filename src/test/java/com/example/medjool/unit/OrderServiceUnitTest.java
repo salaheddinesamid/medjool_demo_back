@@ -1,6 +1,5 @@
 package com.example.medjool.unit;
 
-import com.example.medjool.dto.OrderRequestDto;
 import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.PalletRepository;

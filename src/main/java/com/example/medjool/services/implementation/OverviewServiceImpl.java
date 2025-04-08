@@ -1,6 +1,4 @@
 package com.example.medjool.services.implementation;
-
-import com.example.medjool.constants.ServerConstants;
 import com.example.medjool.dto.OverviewDto;
 import com.example.medjool.model.Order;
 import com.example.medjool.model.OrderStatus;
@@ -19,13 +17,11 @@ public class OverviewServiceImpl implements OverviewService {
     private final OrderRepository orderRepository;
 
     private final AlertServiceImpl alertService;
-    private final ServerConstants serverConstants;
 
-    public OverviewServiceImpl(ProductRepository productRepository, OrderRepository orderRepository, AlertServiceImpl alertService, ServerConstants serverConstants) {
+    public OverviewServiceImpl(ProductRepository productRepository, OrderRepository orderRepository, AlertServiceImpl alertService) {
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.alertService = alertService;
-        this.serverConstants = serverConstants;
     }
 
 
