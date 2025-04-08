@@ -30,6 +30,6 @@ public class Client {
     @OneToMany
     List<Contact> contacts;
 
-    @Column(name = "status")
-    String status;
+   @Enumerated(EnumType.STRING)
+   ClientStatus clientStatus;
 }
