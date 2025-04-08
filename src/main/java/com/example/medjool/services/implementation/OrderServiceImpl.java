@@ -4,6 +4,7 @@ import com.example.medjool.dto.OrderItemRequestDto;
 import com.example.medjool.dto.OrderRequestDto;
 import com.example.medjool.dto.OrderResponseDto;
 import com.example.medjool.dto.OrderStatusDto;
+import com.example.medjool.exception.ClientNotActiveException;
 import com.example.medjool.exception.ProductLowStock;
 import com.example.medjool.exception.ProductNotFoundException;
 import com.example.medjool.model.*;
@@ -38,12 +39,17 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public OrderResponseDto createOrder(OrderRequestDto orderRequest) {
 
+
+
         // Create new order object
         Order order = new Order();
         LocalDate orderDate = LocalDate.now();
 
         // Find the corresponding client
         Client client = clientRepository.findByCompanyName(orderRequest.getClientName());
+        if(client.getClientStatus() != ClientStatus.ACTIVE) {
+            throw new ClientNotActiveException();
+        }
         order.setClient(client);
 
         // Initiate the total price;
