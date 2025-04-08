@@ -11,7 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/*
 @Configuration
 public class SimpleFilter extends OncePerRequestFilter {
 
@@ -20,9 +19,12 @@ public class SimpleFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        logger.info("Incoming request: " + request.getRequestURI() + "Type of request:" + request.getMethod());
+        logger.info("Incoming request: {}Type of request:{}", request.getRequestURI(), request.getMethod());
+
+        // IMPORTANT: Continue the filter chain
+        filterChain.doFilter(request, response);
+
+        // You can also log the response if needed
+        logger.info("Outgoing response with status: {}", response.getStatus());
     }
 }
-
-
- */
