@@ -41,7 +41,6 @@ public class OrderServiceImpl implements OrderService{
     public OrderResponseDto createOrder(OrderRequestDto orderRequest) {
 
 
-
         // Create new order object
         Order order = new Order();
         LocalDate orderDate = LocalDate.now();

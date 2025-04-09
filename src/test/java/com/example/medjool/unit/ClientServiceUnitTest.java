@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
+
 
 import java.util.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,6 +58,8 @@ public class ClientServiceUnitTest {
         Address savedAddress = new Address(1L, "123 Main St", "Springfield", "IL", "USA", "62704");
         Contact savedContact = new Contact(1, "sales@example.com", "+123456789", "Sales");
         Client savedClient = new Client();
+
+        // Saved client
         savedClient.setClientId(1);
         savedClient.setCompanyName("Acme Corp");
         savedClient.setAddresses(List.of(savedAddress));
@@ -83,7 +85,7 @@ public class ClientServiceUnitTest {
         verify(clientRepository, times(1)).save(any(Client.class));
     }
 
-    /* To be implemented...
+
     @Test
     public void whenAddingDuplicateClient_thenShouldReturnConflict() {
         // Given
@@ -100,22 +102,23 @@ public class ClientServiceUnitTest {
                 "ACTIVE"
         );
 
-        // Mock repository responses
-        when(clientRepository.findByCompanyName("Acme Corp"))
-                .thenReturn(null)  // First call returns false (not exists)
-                .thenReturn(Client.class);  // Second call returns true (exists)
-
+        // Create a saved client instance to return for duplicate check
         Address savedAddress = new Address(1L, "123 Main St", "Springfield", "IL", "USA", "62704");
         Contact savedContact = new Contact(1, "sales@example.com", "+123456789", "Sales");
-        Client savedClient = new Client();
-        savedClient.setClientId(1);
-        savedClient.setCompanyName("Acme Corp");
-        savedClient.setAddresses(List.of(savedAddress));
-        savedClient.setContacts(List.of(savedContact));
+        Client existingClient = new Client();
+        existingClient.setClientId(1);
+        existingClient.setCompanyName("Acme Corp");
+        existingClient.setAddresses(List.of(savedAddress));
+        existingClient.setContacts(List.of(savedContact));
+
+        // Mock repository responses
+        when(clientRepository.findByCompanyName("Acme Corp"))
+                .thenReturn(null)  // First call - no client exists
+                .thenReturn(existingClient);  // Second call - client exists
 
         when(addressRepository.save(any())).thenReturn(savedAddress);
         when(contactRepository.save(any())).thenReturn(savedContact);
-        when(clientRepository.save(any())).thenReturn(savedClient);
+        when(clientRepository.save(any())).thenReturn(existingClient);
 
         // When - First attempt (should succeed)
         ResponseEntity<Object> response1 = configurationService.addClient(clientDto);
@@ -130,6 +133,4 @@ public class ClientServiceUnitTest {
         assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(response2.getBody()).isEqualTo("Client with this company name and website already exists");
     }
-
-     */
 }
