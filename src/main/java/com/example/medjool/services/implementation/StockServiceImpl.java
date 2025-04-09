@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +31,8 @@ public class StockServiceImpl implements StockService {
     }
 
     public Product getProduct(Long productId){
-        return productRepository.findById(productId).get();
+        Optional<Product> product = productRepository.findById(productId);
+        return product.orElse(null);
     }
 
 

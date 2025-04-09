@@ -1,5 +1,9 @@
 package com.example.medjool.unit;
 
+import com.example.medjool.dto.OrderRequestDto;
+import com.example.medjool.exception.ClientNotActiveException;
+import com.example.medjool.model.Client;
+import com.example.medjool.model.ClientStatus;
 import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.PalletRepository;
@@ -11,6 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 
 @SpringBootTest
@@ -36,47 +43,22 @@ public class OrderServiceUnitTest {
 
     // To be completed...
 
-
-
-    /*
-
     @Test
-    void createOrder_WithValidRequest_ShouldCreateOrder() {
-        // Given
+    void testCreateOrder_ClientNotActive() {
+        // Arrange
         OrderRequestDto request = new OrderRequestDto();
-        request.setClientName("ActiveClient");
-        request.setItems(List.of(
-                new OrderItemRequestDto(1L, "20", "Red", "A", 10.0, 5.0, 2, "Box")
-        ));
+        request.setClientName("XYZ Inc");
 
-        Client activeClient = new Client();
-        activeClient.setClientStatus(ClientStatus.ACTIVE);
+        Client client = new Client();
+        client.setClientStatus(ClientStatus.INACTIVE);
 
-        Product product = new Product();
-        product.setProductId(1L);
-        product.setTotalWeight(100.0);
+        when(clientRepository.findByCompanyName("Mafriq Limited")).thenReturn(client);
 
-        Pallet pallet = new Pallet();
-        pallet.setPalletId(1L);
-
-        when(clientRepository.findByCompanyName("ActiveClient")).thenReturn(activeClient);
-        when(productRepository.findByCallibreAndColorAndQuality("20", "Red", "A")).thenReturn(product);
-        when(palletRepository.findById(1L)).thenReturn(Optional.of(pallet));
-        when(orderRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        // When
-        OrderResponseDto response = orderService.createOrder(request);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(50.0, response.getTotalPrice()); // 10kg * 5.0/kg
-        assertEquals(10.0, response.getTotalWeight());
-        verify(productRepository, times(1)).save(product);
-        assertEquals(90.0, product.getTotalWeight()); // 100 - 10
+        // Assert + Act
+        assertThrows(ClientNotActiveException.class, () -> {
+            orderService.createOrder(request);
+        });
     }
-
-     */
-
 
     @Test
     public void ensuresAllOrderItemsAreAvailable(){
