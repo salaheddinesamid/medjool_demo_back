@@ -18,15 +18,11 @@ import java.util.List;
 @RequestMapping("api/stock/")
 public class StockController {
 
-    private final StockServiceImpl stockService;
-    private final OverviewServiceImpl overviewService;
+    @Autowired
+    private  StockServiceImpl stockService;
 
     @Autowired
-    public StockController(StockServiceImpl stockService,
-                           OverviewServiceImpl overviewService) {
-        this.stockService = stockService;
-        this.overviewService = overviewService;
-    }
+    private  OverviewServiceImpl overviewService;
 
 
     @GetMapping("get_all")

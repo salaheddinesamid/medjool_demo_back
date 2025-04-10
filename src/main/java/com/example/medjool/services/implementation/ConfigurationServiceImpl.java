@@ -8,6 +8,7 @@ import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.ContactRepository;
 import com.example.medjool.repository.PalletRepository;
 import com.example.medjool.services.ConfigurationService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -78,6 +79,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return new ResponseEntity<>(client, HttpStatus.CREATED);
     }
 
+    @Cacheable(value = "clients")
     @Override
     public ResponseEntity<List<Client>> getAll(){
         List<Client> clients = clientRepository.findAll();
@@ -161,6 +163,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return ResponseEntity.ok().body(pallet);
     }
 
+    @Cacheable(value = "pallets")
     @Override
     public ResponseEntity<List<Pallet>> getAllPallets(){
         List<Pallet> pallets = palletRepository.findAll();

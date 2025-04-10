@@ -8,6 +8,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,11 @@ public class StockServiceImpl implements StockService {
     }
 
 
+    @Cacheable(value = "products")
     @Override
     public List<ProductResponseDto> getAllProducts(){
+
+        System.out.println("👉 Fetching products from DB...");
         List<Product> products = productRepository.findAll();
 
         List<ProductResponseDto> productResponseDtos =

@@ -15,6 +15,9 @@ import com.example.medjool.repository.PalletRepository;
 import com.example.medjool.repository.ProductRepository;
 import com.example.medjool.services.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -110,6 +113,7 @@ public class OrderServiceImpl implements OrderService{
         return null; // Or return empty order response
     }
 
+    @Cacheable(value = "orders")
     @Transactional(readOnly = true)
     @Override
     public List<OrderResponseDto> getAllOrders() {
@@ -119,6 +123,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
 
+    @Cacheable(value = "order", key = "#id")
     @Transactional(readOnly = true)
     @Override
     public OrderResponseDto getOrderById(Long id) {
@@ -128,6 +133,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
 
+    @CacheEvict()
     @Transactional
     @Override
     public ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto){
