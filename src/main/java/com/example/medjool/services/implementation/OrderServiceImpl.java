@@ -133,7 +133,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
 
-    @CacheEvict()
+    @CacheEvict(value = "order", key = "#id")
     @Transactional
     @Override
     public ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto){
@@ -143,7 +143,7 @@ public class OrderServiceImpl implements OrderService{
 
         }
 
-        if(order.getStatus() == OrderStatus.IN_PRODUCTION){
+        if(order.getStatus() == OrderStatus.IN_PRODUCTION && orderStatusDto.getNewStatus().equals("CANCELED")){
             throw new OrderCannotBeCanceledException();
         }
 
