@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OverviewServiceImpl implements OverviewService {
 
-    private final ProductRepository productRepository;;
+    private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
     private final AlertServiceImpl alertService;

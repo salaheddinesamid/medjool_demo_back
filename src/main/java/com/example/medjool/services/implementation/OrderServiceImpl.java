@@ -113,7 +113,7 @@ public class OrderServiceImpl implements OrderService{
         return null; // Or return empty order response
     }
 
-    @Cacheable(value = "orders")
+
     @Transactional(readOnly = true)
     @Override
     public List<OrderResponseDto> getAllOrders() {
@@ -123,7 +123,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
 
-    @Cacheable(value = "order", key = "#id")
+
     @Transactional(readOnly = true)
     @Override
     public OrderResponseDto getOrderById(Long id) {

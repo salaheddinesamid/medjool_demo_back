@@ -4,6 +4,8 @@ import com.example.medjool.dto.NotificationResponseDto;
 import com.example.medjool.model.Notification;
 import com.example.medjool.repository.NotificationRepository;
 import com.example.medjool.services.AlertService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,12 +31,14 @@ public class AlertServiceImpl implements AlertService {
     }
 
 
+    @Cacheable(value = "alerts")
     @Override
     public List<NotificationResponseDto> getAllAlerts() {
         List<Notification> alerts = notificationRepository.findAll();
         return alerts.stream().map(NotificationResponseDto::new).toList();
     }
 
+    @CacheEvict(value = "alerts", allEntries = true)
     @Override
     public void markAllAsRead() {
         for(Notification notification : notificationRepository.findAll()) {
