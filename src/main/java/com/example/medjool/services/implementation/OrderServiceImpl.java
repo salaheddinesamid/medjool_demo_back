@@ -172,6 +172,10 @@ public class OrderServiceImpl implements OrderService{
         if (order.getStatus() == OrderStatus.IN_PRODUCTION) {
             return new ResponseEntity<>("Order is already in production and cannot be canceled at the moment...", HttpStatus.CONFLICT);
         }
+        else if(order.getStatus() == OrderStatus.RECEIVED || order.getStatus() == OrderStatus.CANCELED){
+            return new ResponseEntity<>("Order is already received and can not be canceled...", HttpStatus.CONFLICT);
+        }
+
 
         for (OrderItem orderItem : order.getOrderItems()) {
             Product product = orderItem.getProduct();
