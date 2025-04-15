@@ -31,8 +31,12 @@ public class Order {
     @Column(name = "total_weight", nullable = false)
     private double totalWeight;
 
-    @Column(name = "date")
-    private LocalDate date;
+
+    @Column(name = "production_date")
+    private LocalDate productionDate;
+
+    @Column(name = "delivery_date")
+    private LocalDate deliveryDate;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 30) // optional, to avoid truncation for long enum names
