@@ -36,8 +36,6 @@ public class StockServiceImpl implements StockService {
         return product.orElse(null);
     }
 
-
-    @Cacheable(value = "products")
     @Override
     public List<ProductResponseDto> getAllProducts(){
 

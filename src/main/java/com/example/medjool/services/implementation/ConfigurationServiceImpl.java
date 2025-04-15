@@ -79,7 +79,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return new ResponseEntity<>(client, HttpStatus.CREATED);
     }
 
-    @Cacheable(value = "clients")
+
     @Override
     public ResponseEntity<List<Client>> getAll(){
         List<Client> clients = clientRepository.findAll();
@@ -163,7 +163,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         return ResponseEntity.ok().body(pallet);
     }
 
-    @Cacheable(value = "pallets")
+
+    
     @Override
     public ResponseEntity<List<Pallet>> getAllPallets(){
         List<Pallet> pallets = palletRepository.findAll();
