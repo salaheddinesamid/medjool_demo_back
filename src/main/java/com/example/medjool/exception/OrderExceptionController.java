@@ -13,4 +13,9 @@ public class OrderExceptionController {
     public ResponseEntity<Object> handleOrderCannotBeCanceledException(OrderCannotBeCanceledException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<Object> handleOrderNotFoundException(OrderNotFoundException ex) {
+        return new ResponseEntity<>("Order not found... Please, select an appropriate order to move forward.", HttpStatus.NOT_FOUND);
+    }
 }

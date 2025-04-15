@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    OrderResponseDto createOrder(OrderRequestDto orderDto);
+    OrderResponseDto createOrder(OrderRequestDto orderDto) throws Exception;
     List<OrderResponseDto> getAllOrders();
     OrderResponseDto getOrderById(Long id);
     ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto);

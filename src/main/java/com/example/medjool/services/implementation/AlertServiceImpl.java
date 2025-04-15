@@ -5,7 +5,6 @@ import com.example.medjool.model.Notification;
 import com.example.medjool.repository.NotificationRepository;
 import com.example.medjool.services.AlertService;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

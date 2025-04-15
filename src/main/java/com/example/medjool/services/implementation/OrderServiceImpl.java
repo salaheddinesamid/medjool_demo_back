@@ -9,10 +9,7 @@ import com.example.medjool.exception.OrderCannotBeCanceledException;
 import com.example.medjool.exception.ProductLowStock;
 import com.example.medjool.exception.ProductNotFoundException;
 import com.example.medjool.model.*;
-import com.example.medjool.repository.ClientRepository;
-import com.example.medjool.repository.OrderRepository;
-import com.example.medjool.repository.PalletRepository;
-import com.example.medjool.repository.ProductRepository;
+import com.example.medjool.repository.*;
 import com.example.medjool.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -32,16 +30,19 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService{
+
+
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final ClientRepository clientRepository;
     private final PalletRepository palletRepository;
+    private final ShipmentServiceImpl shipmentService;
 
     Logger logger = Logger.getLogger(OrderService.class.getName());
 
     @Transactional
     @Override
-    public OrderResponseDto createOrder(OrderRequestDto orderRequest) {
+    public OrderResponseDto createOrder(OrderRequestDto orderRequest) throws Exception {
 
 
         // Create new order object
@@ -107,6 +108,8 @@ public class OrderServiceImpl implements OrderService{
             order.setStatus(OrderStatus.valueOf("PRELIMINARY"));
             order.setDate(orderDate);
             Order savedOrder = orderRepository.save(order);
+
+            shipmentService.createShipment(Optional.of(savedOrder));
             return new OrderResponseDto(savedOrder);
         }
 

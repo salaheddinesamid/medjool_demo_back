@@ -8,7 +8,6 @@ import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.ContactRepository;
 import com.example.medjool.repository.PalletRepository;
 import com.example.medjool.services.ConfigurationService;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
