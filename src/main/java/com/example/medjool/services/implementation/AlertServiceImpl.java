@@ -31,10 +31,11 @@ public class AlertServiceImpl implements AlertService {
     }
 
 
-    @Cacheable(value = "alerts")
+
+
     @Override
     public List<NotificationResponseDto> getAllAlerts() {
-        List<Notification> alerts = notificationRepository.findAll();
+        List<Notification> alerts = notificationRepository.findAllByRead(false);
         return alerts.stream().map(NotificationResponseDto::new).toList();
     }
 

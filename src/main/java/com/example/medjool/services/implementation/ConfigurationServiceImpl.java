@@ -164,7 +164,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
 
-    
+
     @Override
     public ResponseEntity<List<Pallet>> getAllPallets(){
         List<Pallet> pallets = palletRepository.findAll();
