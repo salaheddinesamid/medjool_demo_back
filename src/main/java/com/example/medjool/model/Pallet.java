@@ -36,4 +36,9 @@ public class Pallet {
 
     @Column(name = "notes")
     private String notes;
+
+    @Column(name = "production_duration")
+    private double productionDuration;
+
+    
 }
