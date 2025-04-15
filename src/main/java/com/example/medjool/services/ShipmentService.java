@@ -10,9 +10,11 @@ public interface ShipmentService {
 
     void createShipment(Optional<Order> order) throws Exception;
 
-    void cancelShipment(String shipmentId) throws Exception;
+    void cancelShipment(long shipmentId) throws Exception;
 
-    void updateShipmentTracker(String shipmentId, String trackingNumber) throws Exception;
+    void updateShipmentTracker(long shipmentId, String trackingNumber) throws Exception;
+
+
 
     void trackShipment(String shipmentId) throws Exception;
 

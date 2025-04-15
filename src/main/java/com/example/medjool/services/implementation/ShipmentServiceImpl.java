@@ -40,13 +40,17 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void cancelShipment(String shipmentId) throws Exception {
+    public void cancelShipment(long shipmentId) throws Exception {
 
     }
 
-    @Override
-    public void updateShipment(String shipmentId, String trackingNumber) throws Exception {
 
+    @Override
+    public void updateShipmentTracker(long shipmentId, String trackingNumber) throws Exception {
+
+        Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(() -> new Exception("Shipment not found"));
+        shipment.setTrackingNumber(trackingNumber);
+        shipmentRepository.save(shipment);
     }
 
     @Override
