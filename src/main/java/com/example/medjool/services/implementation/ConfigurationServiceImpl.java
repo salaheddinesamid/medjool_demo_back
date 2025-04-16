@@ -150,7 +150,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 palletDto.getDimensions()
         );
 
-
+        // Preparation hours:
+        pallet.setPreparationTime(palletDto.getPreparationTime());
         pallet.setPackaging(palletDto.getPackaging());
         pallet.setTag(palletDto.getTag());
 
