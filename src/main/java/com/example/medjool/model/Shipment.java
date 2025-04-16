@@ -15,6 +15,9 @@ public class Shipment {
 
     private String trackingNumber;
 
+    @Column(name = "tracking_url")
+    private String trackingUrl;
+
     @OneToOne
     private Order order;
 
