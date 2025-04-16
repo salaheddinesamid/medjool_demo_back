@@ -4,6 +4,7 @@ import com.example.medjool.dto.OrderRequestDto;
 import com.example.medjool.dto.OrderResponseDto;
 
 import com.example.medjool.dto.OrderStatusDto;
+import com.example.medjool.dto.OrderUpdateRequestDto;
 import com.example.medjool.services.implementation.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,9 +35,14 @@ public class OrderController {
         return orderService.getAllOrders();
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("status/update/{id}")
     public ResponseEntity<Object> updateOrder(@PathVariable Long id, @RequestBody OrderStatusDto orderStatusDto) throws Exception {
         return orderService.updateOrderStatus(id,orderStatusDto);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> updateOrder(@PathVariable Long id, @RequestBody OrderUpdateRequestDto orderRequestDto) throws Exception {
+        return orderService.updateOrder(id,orderRequestDto);
     }
 
     @DeleteMapping("/cancel/{id}")
