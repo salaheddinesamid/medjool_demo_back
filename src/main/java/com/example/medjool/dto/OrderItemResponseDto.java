@@ -13,6 +13,7 @@ public class OrderItemResponseDto {
     private String callibre;
     private double pricePerKg;
     private double packaging;
+    private int palletId;
     private int numberOfPallets;
     private double itemWeight;
 
@@ -25,5 +26,6 @@ public class OrderItemResponseDto {
         this.callibre = orderItem.getProduct().getCallibre();
         this.numberOfPallets = orderItem.getNumberOfPallets();
         this.itemWeight = orderItem.getItemWeight();
+        this.palletId = orderItem.getPallet().getPalletId();
     }
 }

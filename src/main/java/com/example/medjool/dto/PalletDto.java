@@ -11,6 +11,7 @@ public class PalletDto {
     Integer numberOfStoriesInPallet;
     String dimensions;
     Float totalNet;
+    float preparationTime;
     String tag;
     String notes;
 }

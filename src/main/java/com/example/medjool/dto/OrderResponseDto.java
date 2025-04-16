@@ -15,6 +15,7 @@ public class OrderResponseDto {
     private double totalPrice;
     private double totalWeight;
     private String status;
+
     private List<OrderItemResponseDto> items;
     private LocalDate productionDate;
     private LocalDate deliveryDate;
