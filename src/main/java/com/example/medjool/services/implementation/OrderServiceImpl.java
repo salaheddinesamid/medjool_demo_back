@@ -98,7 +98,7 @@ public class OrderServiceImpl implements OrderService{
 
 
             // Calculate the estimation delivery date:
-            workingHours += (int) pallet.get().getProductionDuration();
+            workingHours += (int) pallet.get().getPreparationTime();
         }
 
         // Only save if we have valid items
@@ -142,40 +142,34 @@ public class OrderServiceImpl implements OrderService{
     public ResponseEntity<Object> updateOrder(Long id, OrderUpdateRequestDto orderUpdateRequestDto) {
         Optional<Order> order = orderRepository.findById(id);
         order.ifPresent(o -> {
-            for (OrderItemResponseDto itemRequest : orderUpdateRequestDto.getItems()) {
-                Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getCallibre(),itemRequest.getColor(),itemRequest.getQuality());
-                Optional<Pallet> pallet = palletRepository.findById(itemRequest.getPalletId());
+            for (OrderItemUpdateRequestDto itemRequest : orderUpdateRequestDto.getUpdatedItems()) {
+                Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getNewCallibre(), itemRequest.getNewColor(), itemRequest.getNewQuality());
+                Optional<Pallet> pallet = palletRepository.findById(itemRequest.getNewPalletId());
                 // Skip if product not found or insufficient stock
                 if (product == null){
                     throw new ProductNotFoundException();
                 }
-                else if (product.getTotalWeight() < itemRequest.getItemWeight()){
+                else if (product.getTotalWeight() < itemRequest.getNewWeight()){
                     throw new ProductLowStock();
                 }
                 // Update product inventory
                 logger.info("The product with id : " + product.getProductId() + "is being updated...");
-                product.setTotalWeight(product.getTotalWeight() - itemRequest.getItemWeight());
+                product.setTotalWeight(product.getTotalWeight() - itemRequest.getNewWeight());
                 productRepository.save(product);
 
                 // Update order item
-                OrderItem orderItem = orderItemRepository.findById(itemRequest.getId()).get();
+                OrderItem orderItem = orderItemRepository.findById(itemRequest.getItemId()).get();
                 orderItem.setProduct(product);
-                orderItem.setPricePerKg(itemRequest.getPricePerKg());
-                orderItem.setPackaging(itemRequest.getPackaging());
-                orderItem.setNumberOfPallets(itemRequest.getNumberOfPallets());
-                orderItem.setItemWeight(itemRequest.getItemWeight());
+                orderItem.setPricePerKg(itemRequest.getNewPrice());
+                orderItem.setPackaging(itemRequest.getNewPackaging());
+                orderItem.setNumberOfPallets(itemRequest.getNewPalletId());
+                orderItem.setItemWeight(itemRequest.getNewWeight());
                 orderItem.setPallet(pallet.get());
 
             }
         });
 
-        order.ifPresent(o -> {
-            o.setStatus(OrderStatus.valueOf(orderUpdateRequestDto.getNewStatus()));
-            orderRepository.save(o);
-        });
-
-        return order.map(o -> ResponseEntity.ok(new OrderResponseDto(o)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found"));
+        return new ResponseEntity<>("Order has been updated.", HttpStatus.OK);
     }
 
 
