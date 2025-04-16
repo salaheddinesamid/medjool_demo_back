@@ -16,7 +16,8 @@ public class OrderResponseDto {
     private double totalWeight;
     private String status;
     private List<OrderItemResponseDto> items;
-    private LocalDate orderDate;
+    private LocalDate productionDate;
+    private LocalDate deliveryDate;
 
     public OrderResponseDto(Order order) {
         this.id = order.getId();
@@ -27,6 +28,7 @@ public class OrderResponseDto {
         this.items = order.getOrderItems().stream()
                 .map(OrderItemResponseDto::new)
                 .toList();
-        this.orderDate = order.getDate();
+        this.productionDate = order.getProductionDate();
+        this.deliveryDate = order.getDeliveryDate();
     }
 }
