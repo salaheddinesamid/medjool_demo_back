@@ -70,6 +70,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             ShipmentDetailsDto shipmentDetailsDto = new ShipmentDetailsDto();
             shipmentDetailsDto.setShipmentId(shipment.getShipmentId());
             shipmentDetailsDto.setTrackingNumber(shipment.getTrackingNumber());
+            shipmentDetailsDto.setTrackingUrl(shipment.getTrackingUrl());
             shipmentDetailsDto.setOrderId(shipment.getOrder().getId());
             return shipmentDetailsDto;
         }).toList();
