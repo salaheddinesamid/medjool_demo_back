@@ -1,9 +1,6 @@
 package com.example.medjool.services.implementation;
 
-import com.example.medjool.dto.OrderItemRequestDto;
-import com.example.medjool.dto.OrderRequestDto;
-import com.example.medjool.dto.OrderResponseDto;
-import com.example.medjool.dto.OrderStatusDto;
+import com.example.medjool.dto.*;
 import com.example.medjool.exception.ClientNotActiveException;
 import com.example.medjool.exception.OrderCannotBeCanceledException;
 import com.example.medjool.exception.ProductLowStock;
@@ -34,6 +31,7 @@ public class OrderServiceImpl implements OrderService{
     private final ClientRepository clientRepository;
     private final PalletRepository palletRepository;
     private final ShipmentServiceImpl shipmentService;
+    private final OrderItemRepository orderItemRepository;
 
     Logger logger = Logger.getLogger(OrderService.class.getName());
 
@@ -137,6 +135,47 @@ public class OrderServiceImpl implements OrderService{
         return orderRepository.findById(id)
                 .map(OrderResponseDto::new)
                 .orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Object> updateOrder(Long id, OrderUpdateRequestDto orderUpdateRequestDto) {
+        Optional<Order> order = orderRepository.findById(id);
+        order.ifPresent(o -> {
+            for (OrderItemResponseDto itemRequest : orderUpdateRequestDto.getItems()) {
+                Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getCallibre(),itemRequest.getColor(),itemRequest.getQuality());
+                Optional<Pallet> pallet = palletRepository.findById(itemRequest.getPalletId());
+                // Skip if product not found or insufficient stock
+                if (product == null){
+                    throw new ProductNotFoundException();
+                }
+                else if (product.getTotalWeight() < itemRequest.getItemWeight()){
+                    throw new ProductLowStock();
+                }
+                // Update product inventory
+                logger.info("The product with id : " + product.getProductId() + "is being updated...");
+                product.setTotalWeight(product.getTotalWeight() - itemRequest.getItemWeight());
+                productRepository.save(product);
+
+                // Update order item
+                OrderItem orderItem = orderItemRepository.findById(itemRequest.getId()).get();
+                orderItem.setProduct(product);
+                orderItem.setPricePerKg(itemRequest.getPricePerKg());
+                orderItem.setPackaging(itemRequest.getPackaging());
+                orderItem.setNumberOfPallets(itemRequest.getNumberOfPallets());
+                orderItem.setItemWeight(itemRequest.getItemWeight());
+                orderItem.setPallet(pallet.get());
+
+            }
+        });
+
+        order.ifPresent(o -> {
+            o.setStatus(OrderStatus.valueOf(orderUpdateRequestDto.getNewStatus()));
+            orderRepository.save(o);
+        });
+
+        return order.map(o -> ResponseEntity.ok(new OrderResponseDto(o)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found"));
     }
 
 
