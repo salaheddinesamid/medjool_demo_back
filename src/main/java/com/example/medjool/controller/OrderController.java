@@ -35,7 +35,7 @@ public class OrderController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateOrder(@PathVariable Long id, @RequestBody OrderStatusDto orderStatusDto) {
+    public ResponseEntity<Object> updateOrder(@PathVariable Long id, @RequestBody OrderStatusDto orderStatusDto) throws Exception {
         return orderService.updateOrderStatus(id,orderStatusDto);
     }
 

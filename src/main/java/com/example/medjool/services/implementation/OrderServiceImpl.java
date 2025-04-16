@@ -13,14 +13,11 @@ import com.example.medjool.repository.*;
 import com.example.medjool.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -117,7 +114,6 @@ public class OrderServiceImpl implements OrderService{
             order.setDeliveryDate(deliveryDate);
             Order savedOrder = orderRepository.save(order);
 
-            shipmentService.createShipment(Optional.of(savedOrder));
             return new OrderResponseDto(savedOrder);
         }
 
@@ -147,7 +143,7 @@ public class OrderServiceImpl implements OrderService{
     @CacheEvict(value = "order", key = "#id")
     @Transactional
     @Override
-    public ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto){
+    public ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto) throws Exception {
         Order order = orderRepository.findById(id).orElse(null);
         if (order == null) {
             return ResponseEntity.notFound().build();
@@ -164,6 +160,12 @@ public class OrderServiceImpl implements OrderService{
                 product.setTotalWeight(product.getTotalWeight() + orderItem.getItemWeight());
             }
         }
+
+        else if (orderStatusDto.getNewStatus().equals("SHIPPED")){
+            shipmentService.createShipment(Optional.of(order));
+        }
+
+
         order.setStatus(OrderStatus.valueOf(orderStatusDto.getNewStatus()));
         orderRepository.save(order);
         return ResponseEntity.ok().build();

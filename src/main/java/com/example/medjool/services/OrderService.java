@@ -12,7 +12,7 @@ public interface OrderService {
     OrderResponseDto createOrder(OrderRequestDto orderDto) throws Exception;
     List<OrderResponseDto> getAllOrders();
     OrderResponseDto getOrderById(Long id);
-    ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto);
+    ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto) throws Exception;
     ResponseEntity<Object> cancelOrder(Long id);
 
 
