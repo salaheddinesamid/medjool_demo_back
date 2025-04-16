@@ -142,6 +142,9 @@ public class OrderServiceImpl implements OrderService{
     public ResponseEntity<Object> updateOrder(Long id, OrderUpdateRequestDto orderUpdateRequestDto) {
         Optional<Order> order = orderRepository.findById(id);
         order.ifPresent(o -> {
+            if(o.getStatus() == OrderStatus.READY_TO_SHIPPED){
+                throw new OrderCannotBeCanceledException();
+            }
             for (OrderItemUpdateRequestDto itemRequest : orderUpdateRequestDto.getUpdatedItems()) {
                 Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getNewCallibre(), itemRequest.getNewColor(), itemRequest.getNewQuality());
                 Optional<Pallet> pallet = palletRepository.findById(itemRequest.getNewPalletId());
