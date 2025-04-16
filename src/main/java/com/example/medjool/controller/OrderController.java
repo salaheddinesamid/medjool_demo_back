@@ -25,7 +25,7 @@ public class OrderController {
 
 
     @PostMapping("")
-    public OrderResponseDto makeOrder(@RequestBody OrderRequestDto orderRequestDto) {
+    public OrderResponseDto makeOrder(@RequestBody OrderRequestDto orderRequestDto) throws Exception {
         return orderService.createOrder(orderRequestDto);
     }
 

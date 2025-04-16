@@ -40,5 +40,5 @@ public class Pallet {
     @Column(name = "production_duration")
     private double productionDuration;
 
-    
+
 }

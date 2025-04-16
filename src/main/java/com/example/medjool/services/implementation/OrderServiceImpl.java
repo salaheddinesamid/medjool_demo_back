@@ -47,8 +47,9 @@ public class OrderServiceImpl implements OrderService{
 
         // Create new order object
         Order order = new Order();
-        LocalDate orderDate = LocalDate.now();
+        LocalDate deliveryDate = LocalDate.now();
 
+        int workingHours = 0;
         // Find the corresponding client
         Client client = clientRepository.findByCompanyName(orderRequest.getClientName());
         if(!client.getClientStatus().toString().equals("ACTIVE")) {
@@ -99,14 +100,21 @@ public class OrderServiceImpl implements OrderService{
             totalWeight += itemRequest.getItemWeight();
 
             order.addOrderItem(orderItem);
+
+
+            // Calculate the estimation delivery date:
+            workingHours += (int) pallet.get().getProductionDuration();
         }
 
         // Only save if we have valid items
         if (!order.getOrderItems().isEmpty()) {
+            LocalDate prod_date = LocalDate.now();
+            deliveryDate = LocalDate.now() .plusDays(workingHours / 24);
             order.setTotalPrice(totalPrice);
             order.setTotalWeight(totalWeight);
             order.setStatus(OrderStatus.valueOf("PRELIMINARY"));
-            order.setDate(orderDate);
+            order.setProductionDate(prod_date);
+            order.setDeliveryDate(deliveryDate);
             Order savedOrder = orderRepository.save(order);
 
             shipmentService.createShipment(Optional.of(savedOrder));
