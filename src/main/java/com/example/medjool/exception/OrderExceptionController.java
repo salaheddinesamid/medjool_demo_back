@@ -18,4 +18,9 @@ public class OrderExceptionController {
     public ResponseEntity<Object> handleOrderNotFoundException(OrderNotFoundException ex) {
         return new ResponseEntity<>("Order not found... Please, select an appropriate order to move forward.", HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(OrderCannotBeChangedException.class)
+    public ResponseEntity<Object> handleOrderChangeException(OrderCannotBeChangedException ex) {
+        return new ResponseEntity<>("The order is READY TO SHIP. It can not be changed or canceled...", HttpStatus.BAD_REQUEST);
+    }
 }
