@@ -15,7 +15,6 @@ public interface ShipmentService {
     void updateShipmentTracker(long shipmentId, String trackingNumber) throws Exception;
 
 
-
     void trackShipment(String shipmentId) throws Exception;
 
     List<ShipmentDetailsDto> getAllShipments() throws Exception;

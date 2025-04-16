@@ -17,6 +17,8 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     private final ShipmentRepository shipmentRepository;
     private final OrderRepository orderRepository;
+
+    private static final String SHIPMENT_URL = "https://www.tracking.com/tracking/";
     @Autowired
     public ShipmentServiceImpl(ShipmentRepository shipmentRepository, ShipmentRepository shipmentRepository1, OrderRepository orderRepository) {
 
@@ -49,7 +51,9 @@ public class ShipmentServiceImpl implements ShipmentService {
     public void updateShipmentTracker(long shipmentId, String trackingNumber) throws Exception {
 
         Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(() -> new Exception("Shipment not found"));
+        String trackingUrl = SHIPMENT_URL + trackingNumber;
         shipment.setTrackingNumber(trackingNumber);
+        shipment.setTrackingUrl(trackingUrl);
         shipmentRepository.save(shipment);
     }
 
