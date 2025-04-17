@@ -43,7 +43,9 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public void cancelShipment(long shipmentId) throws Exception {
-
+        Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(() -> new Exception("Shipment not found"));
+        shipment.setCanceled(true);
+        shipmentRepository.save(shipment);
     }
 
 
