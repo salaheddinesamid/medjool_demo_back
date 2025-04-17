@@ -12,4 +12,5 @@ public interface StockService {
     List<ProductResponseDto> getAllProducts();
     ResponseEntity<Object> updateStock(MultipartFile file) throws IOException;
 
+
 }

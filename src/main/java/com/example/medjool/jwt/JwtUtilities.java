@@ -1,23 +1,62 @@
 package com.example.medjool.jwt;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.logging.Logger;
 
 @Service
 public class JwtUtilities {
 
-    private static String SECRET_KEY = "65A1716B65367C69B4BDCC822A44A";
+    private static String SECRET_KEY = "72EBC7D18D986BB447A348C12AF5C";
+    Logger log = Logger.getLogger(JwtUtilities.class.getName());
 
     public String generateToken(String email, String role) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(email) // Set the subject of the token
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
+    }
+
+    // Extract the token
+    public String getToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
+
+    // Extracts the email from the JWT token:
+    public String extractUserName(String token){
+        return Jwts
+                .parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    public boolean validateToken(String token){
+        try{
+            Jwts
+                    .parser().setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token);
+            return true;
+        }catch (MalformedJwtException e) {
+            log.info("Invalid JWT token.");
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT token.");
+        } catch (UnsupportedJwtException e) {
+            log.info("Unsupported JWT token.");
+        } catch (IllegalArgumentException e) {
+            log.info("JWT token compact of handler are invalid.");
+        }
+        return false;
     }
 }

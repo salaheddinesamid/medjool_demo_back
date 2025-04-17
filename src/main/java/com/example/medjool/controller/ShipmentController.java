@@ -33,7 +33,7 @@ public class ShipmentController {
 
     @DeleteMapping("/delete/shipmentId")
     public ResponseEntity<String> cancelShipment(@PathVariable long shipmentId) throws Exception {
-
+        return shipmentService.cancelShipment(shipmentId);
     }
 
 }

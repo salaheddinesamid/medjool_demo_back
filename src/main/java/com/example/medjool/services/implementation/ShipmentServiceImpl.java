@@ -7,6 +7,8 @@ import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ShipmentRepository;
 import com.example.medjool.services.ShipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,10 +44,11 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
     @Override
-    public void cancelShipment(long shipmentId) throws Exception {
+    public ResponseEntity<String> cancelShipment(long shipmentId) throws Exception {
         Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(() -> new Exception("Shipment not found"));
         shipment.setCanceled(true);
         shipmentRepository.save(shipment);
+        return new ResponseEntity<>("The shipment has been canceled...", HttpStatus.OK);
     }
 
 

@@ -11,18 +11,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("api/stock/")
 public class StockController {
 
-    @Autowired
-    private  StockServiceImpl stockService;
+
+    private final StockServiceImpl stockService;
+    private final OverviewServiceImpl overviewService;
 
     @Autowired
-    private  OverviewServiceImpl overviewService;
+    public StockController(StockServiceImpl stockService, OverviewServiceImpl overviewService) {
+        this.stockService = stockService;
+        this.overviewService = overviewService;
+    }
 
 
     @GetMapping("get_all")
@@ -35,6 +41,11 @@ public class StockController {
     @GetMapping("overview")
     public ResponseEntity<OverviewDto> getStockOverview() {
         return overviewService.getOverview();
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Object> updateStock(@RequestBody MultipartFile file) throws IOException {
+        return stockService.updateStock(file);
     }
 
     
