@@ -3,6 +3,7 @@ package com.example.medjool.controller;
 import com.example.medjool.dto.ShipmentDetailsDto;
 import com.example.medjool.services.implementation.ShipmentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,11 @@ public class ShipmentController {
     @PutMapping("/update/tracking/{shipmentId}")
     public void updateTrackingNumber(@PathVariable long shipmentId, @RequestParam String trackingNumber) throws Exception {
         shipmentService.updateShipmentTracker(shipmentId, trackingNumber);
+    }
+
+    @DeleteMapping("/delete/shipmentId")
+    public ResponseEntity<String> cancelShipment(@PathVariable long shipmentId) throws Exception {
+
     }
 
 }
