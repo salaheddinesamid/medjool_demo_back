@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 @Service
 public class JwtUtilities {
 
-    private static String SECRET_KEY = "72EBC7D18D986BB447A348C12AF5C";
+    private static final String SECRET_KEY = "A1B2C3D4E5F60718293A4B5C6D7E8F9012A3B4C5D6E7F8091A2B3C4D5E6F7A8B";
     Logger log = Logger.getLogger(JwtUtilities.class.getName());
 
     public String generateToken(String email, String role) {
