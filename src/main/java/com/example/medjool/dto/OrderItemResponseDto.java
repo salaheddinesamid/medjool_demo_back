@@ -9,8 +9,9 @@ import lombok.Setter;
 public class OrderItemResponseDto {
     private Long id;
     private Long productId;
-    private String productName;
     private String callibre;
+    private String quality;
+    private String color;
     private double pricePerKg;
     private double packaging;
     private int palletId;
@@ -20,7 +21,8 @@ public class OrderItemResponseDto {
     public OrderItemResponseDto(OrderItem orderItem) {
         this.id = orderItem.getId();
         this.productId = orderItem.getProduct().getProductId();
-        this.productName = orderItem.getProduct().getCallibre();
+        this.quality = orderItem.getProduct().getQuality();
+        this.color = orderItem.getProduct().getColor();
         this.pricePerKg = orderItem.getPricePerKg();
         this.packaging = orderItem.getPackaging();
         this.callibre = orderItem.getProduct().getCallibre();

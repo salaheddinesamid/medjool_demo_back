@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -17,8 +18,8 @@ public class OrderResponseDto {
     private String status;
 
     private List<OrderItemResponseDto> items;
-    private LocalDate productionDate;
-    private LocalDate deliveryDate;
+    private LocalDateTime productionDate;
+    private LocalDateTime deliveryDate;
 
     public OrderResponseDto(Order order) {
         this.id = order.getId();
