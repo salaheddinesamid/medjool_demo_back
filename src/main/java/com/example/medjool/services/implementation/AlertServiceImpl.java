@@ -7,6 +7,7 @@ import com.example.medjool.services.AlertService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,13 +31,12 @@ public class AlertServiceImpl implements AlertService {
     }
 
 
-
-
     @Override
     public List<NotificationResponseDto> getAllAlerts() {
         List<Notification> alerts = notificationRepository.findAllByRead(false);
         return alerts.stream().map(NotificationResponseDto::new).toList();
     }
+
 
     @CacheEvict(value = "alerts", allEntries = true)
     @Override
@@ -51,5 +51,10 @@ public class AlertServiceImpl implements AlertService {
     @Override
     public void markAsRead(Long id) {
         notificationRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean isExists(String content) {
+        return notificationRepository.existsByContent(content);
     }
 }

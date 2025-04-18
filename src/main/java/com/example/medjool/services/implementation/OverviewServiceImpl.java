@@ -1,4 +1,6 @@
 package com.example.medjool.services.implementation;
+
+
 import com.example.medjool.dto.OverviewDto;
 import com.example.medjool.model.Order;
 import com.example.medjool.model.OrderStatus;
@@ -36,7 +38,9 @@ public class OverviewServiceImpl implements OverviewService {
 
             if (product.getTotalWeight() <= 200){
                 String content = "The product id: " + product.getProductId() + "is low stock";
-                alertService.newAlert(content);
+                if(!alertService.isExists(content)){
+                    alertService.newAlert(content);
+                }
             }
             totalStockWeight += product.getTotalWeight();
         }
