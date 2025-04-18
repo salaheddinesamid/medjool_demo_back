@@ -37,7 +37,7 @@ public class JWTFilter extends OncePerRequestFilter {
             String email = jwtUtil.extractUserName(token);
             // Load user details
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            if (userDetails != null) {
+            if (userDetails != null && userDetails.isAccountNonLocked()) {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails.
                                 getUsername(), null, userDetails.getAuthorities());
@@ -45,6 +45,14 @@ public class JWTFilter extends OncePerRequestFilter {
 
                 // Set the authentication context
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
+            else if(userDetails != null && !userDetails.isAccountNonLocked()) {
+                log.info("User with email {} is locked", email);
+            }
+            else {
+                log.info("User with email {} not found", email);
+
             }
         }
         filterChain.doFilter(request, response);
