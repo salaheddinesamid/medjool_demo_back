@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -49,8 +50,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return new ResponseEntity("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
 
+        LocalDateTime now = LocalDateTime.now();
         String token = jwtUtilities.generateToken(user.getEmail(), user.getRole().getRoleName().toString());
         BearerTokenDto bearerTokenDto = new BearerTokenDto(token);
+        user.setLastLogin(now);
+        userRepository.save(user);
 
         return new ResponseEntity<>(bearerTokenDto, HttpStatus.OK);
     }

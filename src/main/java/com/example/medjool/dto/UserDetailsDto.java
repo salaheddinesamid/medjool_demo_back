@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 public class UserDetailsDto {
@@ -13,4 +15,5 @@ public class UserDetailsDto {
     private String email;
     private String role;
     private boolean active;
+    private LocalDateTime lastLogin;
 }
