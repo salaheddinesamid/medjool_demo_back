@@ -28,11 +28,11 @@ public class SecurityConfiguration {
                                         "/api/auth/**",
                                         "/api/stock/**",
                                         "/api/overview/**",
+                                        "/api/configuration/**",
                                         "/api/alert/**",
                                         "/api/notification/**",
-                                        "api/shipment/**"
+                                        "/api/shipment/**"
                                                 ).permitAll()
-                                        .requestMatchers("/api/store/**").hasRole("GENERAL_MANAGER")
                         )
 
                         .addFilterBefore(JWTFilter, UsernamePasswordAuthenticationFilter.class);
