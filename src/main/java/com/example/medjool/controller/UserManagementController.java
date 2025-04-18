@@ -29,4 +29,8 @@ public class UserManagementController {
         return userManagementService.activateUserAccount(userId);
     }
 
+    @PutMapping("/account/hold/{userId}")
+    public ResponseEntity<Object> holdUserAccount(@PathVariable long userId) {
+        return userManagementService.holdUserAccount(userId);
+    }
 }

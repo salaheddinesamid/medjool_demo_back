@@ -13,4 +13,6 @@ public interface UserManagementService {
 
     ResponseEntity<Object> activateUserAccount(Long id);
 
+    ResponseEntity<Object> holdUserAccount(Long id);
+
 }

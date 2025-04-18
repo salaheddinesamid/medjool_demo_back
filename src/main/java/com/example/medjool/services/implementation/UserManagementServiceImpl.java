@@ -31,7 +31,8 @@ public class UserManagementServiceImpl implements UserManagementService {
                         user.getLastName(),
                         user.getEmail(),
                         user.getRole().getRoleName().toString(),
-                        user.isAccountNonLocked()
+                        user.isAccountNonLocked(),
+                        user.getLastLogin()
                         )
                 )
                 .toList();
@@ -51,5 +52,17 @@ public class UserManagementServiceImpl implements UserManagementService {
             userRepository.save(u);
         });
         return new ResponseEntity<>("User account activated", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> holdUserAccount(Long id) {
+
+        // Fetch the user from the database;
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(u->{
+            u.setAccountNonLocked(false);
+        });
+
+        return new ResponseEntity<>("User account hold", HttpStatus.OK);
     }
 }
