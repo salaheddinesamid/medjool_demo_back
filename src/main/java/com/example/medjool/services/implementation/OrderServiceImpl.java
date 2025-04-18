@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -42,7 +43,7 @@ public class OrderServiceImpl implements OrderService{
 
         // Create new order object
         Order order = new Order();
-        LocalDate deliveryDate = LocalDate.now();
+        LocalDateTime deliveryDate;
 
         int workingHours = 0;
         // Find the corresponding client
@@ -103,8 +104,8 @@ public class OrderServiceImpl implements OrderService{
 
         // Only save if we have valid items
         if (!order.getOrderItems().isEmpty()) {
-            LocalDate prod_date = LocalDate.now();
-            deliveryDate = LocalDate.now() .plusDays(workingHours / 24);
+            LocalDateTime prod_date = LocalDateTime.now();
+            deliveryDate = LocalDateTime.now() .plusDays(workingHours / 24);
             order.setTotalPrice(totalPrice);
             order.setTotalWeight(totalWeight);
             order.setStatus(OrderStatus.valueOf("PRELIMINARY"));

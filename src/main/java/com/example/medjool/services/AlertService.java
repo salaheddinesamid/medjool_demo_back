@@ -11,4 +11,5 @@ public interface AlertService {
     List<NotificationResponseDto> getAllAlerts();
     void markAllAsRead();
     void markAsRead(Long id);
+    boolean isExists(String content);
 }

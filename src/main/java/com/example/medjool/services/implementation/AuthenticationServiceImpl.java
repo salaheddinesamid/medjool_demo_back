@@ -48,9 +48,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword()) && user.isAccountNonLocked()) {
             return new ResponseEntity("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
-        else if (!user.isAccountNonLocked()) {
-            return new ResponseEntity("Account is locked", HttpStatus.UNAUTHORIZED);
-        }
 
         String token = jwtUtilities.generateToken(user.getEmail(), user.getRole().getRoleName().toString());
         BearerTokenDto bearerTokenDto = new BearerTokenDto(token);

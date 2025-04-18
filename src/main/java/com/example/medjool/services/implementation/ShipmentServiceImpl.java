@@ -40,13 +40,11 @@ public class ShipmentServiceImpl implements ShipmentService {
                 throw new RuntimeException("Error creating shipment: " + e.getMessage());
             }
         });
-
     }
 
     @Override
     public ResponseEntity<String> cancelShipment(long shipmentId) throws Exception {
         Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(() -> new Exception("Shipment not found"));
-        shipment.setCanceled(true);
         shipmentRepository.save(shipment);
         return new ResponseEntity<>("The shipment has been canceled...", HttpStatus.OK);
     }

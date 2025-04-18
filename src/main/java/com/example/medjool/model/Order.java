@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +34,10 @@ public class Order {
 
 
     @Column(name = "production_date")
-    private LocalDate productionDate;
+    private LocalDateTime productionDate;
 
     @Column(name = "delivery_date")
-    private LocalDate deliveryDate;
+    private LocalDateTime deliveryDate;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 30) // optional, to avoid truncation for long enum names

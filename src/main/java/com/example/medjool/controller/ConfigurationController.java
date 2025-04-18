@@ -3,6 +3,7 @@ package com.example.medjool.controller;
 import com.example.medjool.dto.AddressResponseDto;
 import com.example.medjool.dto.ClientDto;
 import com.example.medjool.dto.PalletDto;
+import com.example.medjool.dto.UserDetailsDto;
 import com.example.medjool.model.Client;
 import com.example.medjool.model.Pallet;
 import com.example.medjool.services.implementation.ConfigurationServiceImpl;
@@ -74,6 +75,7 @@ public class ConfigurationController {
     public ResponseEntity<Object> deletePallet(@PathVariable Integer palletId) {
         return configurationService.deletePallet(palletId);
     }
+
 
 
 
