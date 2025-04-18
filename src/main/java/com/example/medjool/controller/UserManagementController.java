@@ -33,4 +33,14 @@ public class UserManagementController {
     public ResponseEntity<Object> holdUserAccount(@PathVariable long userId) {
         return userManagementService.holdUserAccount(userId);
     }
+
+    @PutMapping("/account/update/{userId}")
+    public ResponseEntity<Object> updateUserDetails(@PathVariable long userId, @RequestBody UserDetailsDto userDetailsDto) {
+        return userManagementService.updateUserDetails(userId, userDetailsDto);
+    }
+
+    @DeleteMapping("/account/delete/{userId}")
+    public ResponseEntity<Object> deleteUserAccount(@PathVariable long userId) {
+        return userManagementService.deleteUserAccount(userId);
+    }
 }
