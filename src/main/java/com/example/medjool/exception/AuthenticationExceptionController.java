@@ -12,4 +12,9 @@ public class AuthenticationExceptionController {
     public ResponseEntity<Object> userAccountLockedException(UserAccountLockedException e) {
         return new ResponseEntity<>("User account is locked. Please contact support.", HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> userNotFoundException(UserNotFoundException e) {
+        return new ResponseEntity<>("User not found. Please contact support.", HttpStatus.NOT_FOUND);
+    }
 }
