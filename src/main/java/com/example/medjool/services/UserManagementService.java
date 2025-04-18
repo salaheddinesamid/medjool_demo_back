@@ -12,7 +12,8 @@ public interface UserManagementService {
     ResponseEntity<UserDetailsDto> getUserById(Long id);
 
     ResponseEntity<Object> activateUserAccount(Long id);
-
+    ResponseEntity<Object> updateUserDetails(Long id, UserDetailsDto userDetailsDto);
     ResponseEntity<Object> holdUserAccount(Long id);
+    ResponseEntity<Object> deleteUserAccount(Long id);
 
 }

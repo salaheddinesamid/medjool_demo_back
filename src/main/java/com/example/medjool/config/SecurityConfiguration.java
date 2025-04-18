@@ -1,6 +1,5 @@
 package com.example.medjool.config;
 
-
 import com.example.medjool.filters.JWTFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

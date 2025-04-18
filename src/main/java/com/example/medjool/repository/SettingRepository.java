@@ -1,4 +1,7 @@
 package com.example.medjool.repository;
 
-public interface SettingRepository {
+import com.example.medjool.model.Setting;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SettingRepository extends JpaRepository<Setting, Long> {
 }
