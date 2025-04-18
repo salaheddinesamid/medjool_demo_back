@@ -147,6 +147,10 @@ public class OrderServiceImpl implements OrderService{
             if(o.getStatus() == OrderStatus.READY_TO_SHIPPED){
                 throw new OrderCannotBeCanceledException();
             }
+
+            // Calculate the new delivery date:
+            double workingHours = 0;
+
             for (OrderItemUpdateRequestDto itemRequest : orderUpdateRequestDto.getUpdatedItems()) {
                 Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getNewCallibre(), itemRequest.getNewColor(), itemRequest.getNewQuality());
                 Optional<Pallet> pallet = palletRepository.findById(itemRequest.getNewPalletId());
@@ -162,6 +166,8 @@ public class OrderServiceImpl implements OrderService{
                 product.setTotalWeight(product.getTotalWeight() - itemRequest.getNewWeight());
                 productRepository.save(product);
 
+                // Incrementing the working hours:
+                workingHours += pallet.get().getPreparationTime();
                 // Update order item
                 OrderItem orderItem = orderItemRepository.findById(itemRequest.getItemId()).get();
                 orderItem.setProduct(product);
@@ -172,8 +178,17 @@ public class OrderServiceImpl implements OrderService{
                 orderItem.setPallet(pallet.get());
 
             }
-        });
+            // Set the new total price
+            o.setTotalWeight(orderUpdateRequestDto.getTotalWeight());
+            o.setTotalPrice(orderUpdateRequestDto.getTotalPrice());
 
+            // Update the production date:
+            LocalDateTime prod_date = LocalDateTime.now();
+            o.setProductionDate(prod_date);
+            // Update the new delivery date:
+            LocalDateTime newDeliveryDate = LocalDateTime.now().plusHours((long) workingHours);
+            o.setDeliveryDate(newDeliveryDate);
+        });
         return new ResponseEntity<>("Order has been updated.", HttpStatus.OK);
     }
 
