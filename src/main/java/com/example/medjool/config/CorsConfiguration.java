@@ -1,6 +1,5 @@
 package com.example.medjool.config;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,26 +9,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @RequiredArgsConstructor
 public class CorsConfiguration{
-
-    /*
-    private final JwtFilterChain jwtFilterChain;
-
-    @Bean
-    SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
-        httpSecurity
-                .csrf()
-                .disable()
-                .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry.requestMatchers(
-                        "api/manager/**","/api/invoice/**",
-                                        "api/file/**",
-                                        "api/product/**",
-                                        "api/order/**").permitAll()
-                );
-        httpSecurity.addFilterBefore(jwtFilterChain, UsernamePasswordAuthenticationFilter.class);
-        return httpSecurity.build();
-    }
-
-     */
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {

@@ -1,6 +1,7 @@
 package com.example.medjool.filters;
 
 import com.example.medjool.exception.UserAccountLockedException;
+import com.example.medjool.exception.UserNotFoundException;
 import com.example.medjool.jwt.JwtUtilities;
 import com.example.medjool.services.implementation.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
@@ -52,7 +53,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 throw new UserAccountLockedException();
             }
             else {
-                log.info("User with email {} not found", email);
+                throw new UserNotFoundException();
 
             }
         }

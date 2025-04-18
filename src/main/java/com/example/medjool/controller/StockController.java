@@ -2,9 +2,6 @@ package com.example.medjool.controller;
 
 import com.example.medjool.dto.OverviewDto;
 import com.example.medjool.dto.ProductResponseDto;
-import com.example.medjool.model.Product;
-import com.example.medjool.services.OverviewService;
-import com.example.medjool.services.StockService;
 import com.example.medjool.services.implementation.OverviewServiceImpl;
 import com.example.medjool.services.implementation.StockServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +27,11 @@ public class StockController {
         this.overviewService = overviewService;
     }
 
-
     @GetMapping("get_all")
     public ResponseEntity<List<ProductResponseDto>> getAll() {
         List<ProductResponseDto> allProducts = stockService.getAllProducts();
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }
-
 
     @GetMapping("overview")
     public ResponseEntity<OverviewDto> getStockOverview() {
@@ -47,6 +42,5 @@ public class StockController {
     public ResponseEntity<Object> updateStock(@RequestBody MultipartFile file) throws IOException {
         return stockService.updateStock(file);
     }
-
     
 }

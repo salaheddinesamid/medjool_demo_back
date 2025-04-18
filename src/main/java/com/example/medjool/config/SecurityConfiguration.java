@@ -32,9 +32,12 @@ public class SecurityConfiguration {
                                         "/api/configuration/**",
                                         "/api/alert/**",
                                         "/api/user/**",
-                                        "/api/notification/**"
+                                        "/api/notification/**",
+                                                "/api/shipment/**",
+                                        "/swagger-ui/**",
+                                        "/api-docs/**"
                                                 ).permitAll()
-                                        .requestMatchers("/api/shipment/**").hasAuthority("GENERAL_MANAGER")
+
                         )
 
                         .addFilterBefore(JWTFilter, UsernamePasswordAuthenticationFilter.class);
