@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +44,7 @@ public class OrderServiceImpl implements OrderService{
         Order order = new Order();
         LocalDateTime deliveryDate;
 
-        int workingHours = 0;
+
         // Find the corresponding client
         Client client = clientRepository.findByCompanyName(orderRequest.getClientName());
         if(!client.getClientStatus().toString().equals("ACTIVE")) {
@@ -58,6 +57,8 @@ public class OrderServiceImpl implements OrderService{
 
         // Initiate the total weight:
         double totalWeight = 0;
+
+        double workingHours = 0;
 
 
         logger.info("New Order is being processed...");
@@ -88,7 +89,8 @@ public class OrderServiceImpl implements OrderService{
             orderItem.setItemWeight(itemRequest.getItemWeight());
             orderItem.setPallet(pallet.get());
 
-
+            // Calculate the estimation delivery date:
+            workingHours += pallet.get().getPreparationTime();
 
             // Calculate totals
             double itemPrice = itemRequest.getPricePerKg() * itemRequest.getItemWeight();
@@ -98,14 +100,13 @@ public class OrderServiceImpl implements OrderService{
             order.addOrderItem(orderItem);
 
 
-            // Calculate the estimation delivery date:
-            workingHours += (int) pallet.get().getPreparationTime();
+
         }
 
         // Only save if we have valid items
         if (!order.getOrderItems().isEmpty()) {
             LocalDateTime prod_date = LocalDateTime.now();
-            deliveryDate = LocalDateTime.now() .plusDays(workingHours / 24);
+            deliveryDate = LocalDateTime.now().plusHours((long) workingHours);
             order.setTotalPrice(totalPrice);
             order.setTotalWeight(totalWeight);
             order.setStatus(OrderStatus.valueOf("PRELIMINARY"));
