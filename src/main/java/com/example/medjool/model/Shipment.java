@@ -18,9 +18,6 @@ public class Shipment {
     @Column(name = "tracking_url")
     private String trackingUrl;
 
-    @Column(name = "is_calnceled")
-    private boolean isCanceled;
-
     @OneToOne
     private Order order;
 
