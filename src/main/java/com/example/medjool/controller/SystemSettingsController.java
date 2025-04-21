@@ -1,9 +1,8 @@
 package com.example.medjool.controller;
 
 import com.example.medjool.dto.SettingDetailsDto;
-import com.example.medjool.dto.SettingUpdateDto;
 import com.example.medjool.services.implementation.SystemSettingServiceImpl;
-import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,22 +10,24 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/system-settings")
-@NoArgsConstructor
 public class SystemSettingsController {
 
-    private SystemSettingServiceImpl systemSettingsService;
+    private final SystemSettingServiceImpl systemSettingService;
 
-    // Get all system settings
-    @GetMapping("get_all")
-    public List<SettingDetailsDto> getAllSettings(){
-        return systemSettingsService.getSystemSettings();
+
+    @Autowired
+    public SystemSettingsController(SystemSettingServiceImpl systemSettingService) {
+        this.systemSettingService = systemSettingService;
     }
 
-    /* To be implemented
-    @PutMapping("/update/")
-    public ResponseEntity<Object> updateSetting(@RequestParam String settingName, @RequestBody SettingUpdateDto settingUpdateDto){
-        return
+    @PutMapping("/min_stock_level/update/")
+    public ResponseEntity<Object> updateMinStockLevel(@RequestParam double newMinStockLevel) throws Exception {
+        return systemSettingService.updateMinProductLevel(newMinStockLevel);
+
     }
 
-     */
+    @GetMapping("/get_all")
+    public ResponseEntity<List<SettingDetailsDto>> getAllSystemSettings() {
+        return systemSettingService.getAllSettings();
+    }
 }
