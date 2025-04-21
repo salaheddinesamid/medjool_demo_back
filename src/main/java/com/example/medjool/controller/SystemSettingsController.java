@@ -2,6 +2,7 @@ package com.example.medjool.controller;
 
 import com.example.medjool.dto.SettingDetailsDto;
 import com.example.medjool.services.implementation.SystemSettingServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/system-settings")
+@Slf4j
 public class SystemSettingsController {
 
     private final SystemSettingServiceImpl systemSettingService;

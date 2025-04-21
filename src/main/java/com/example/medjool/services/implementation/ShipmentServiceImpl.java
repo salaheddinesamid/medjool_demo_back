@@ -45,7 +45,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public ResponseEntity<String> cancelShipment(long shipmentId) throws Exception {
         Shipment shipment = shipmentRepository.findById(shipmentId).orElseThrow(() -> new Exception("Shipment not found"));
-        shipmentRepository.save(shipment);
+        shipmentRepository.delete(shipment);
         return new ResponseEntity<>("The shipment has been canceled...", HttpStatus.OK);
     }
 

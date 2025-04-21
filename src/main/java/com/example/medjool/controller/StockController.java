@@ -17,7 +17,6 @@ import java.util.List;
 @RequestMapping("api/stock/")
 public class StockController {
 
-
     private final StockServiceImpl stockService;
     private final OverviewServiceImpl overviewService;
 
