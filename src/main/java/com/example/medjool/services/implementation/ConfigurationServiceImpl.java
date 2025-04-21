@@ -8,6 +8,7 @@ import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.ContactRepository;
 import com.example.medjool.repository.PalletRepository;
 import com.example.medjool.services.ConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private final ContactRepository contactRepository;
     private final PalletRepository palletRepository;
 
+    @Autowired
     public ConfigurationServiceImpl(ClientRepository clientRepository, AddressRepository addressRepository, ContactRepository contactRepository, PalletRepository palletRepository) {
         this.clientRepository = clientRepository;
         this.addressRepository = addressRepository;
@@ -32,6 +34,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     // Add new client:
     @Override
     public ResponseEntity<Object> addClient(ClientDto clientDto) {
+
 
         if(clientRepository.findByCompanyName(clientDto.getCompanyName())!=null){
             throw new ClientAlreadyFoundException();
@@ -132,35 +135,35 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     // -------------------------- Pallet Configuration Service ---------------------------
     @Override
     public ResponseEntity<Object> addPallet(PalletDto palletDto) {
+        Pallet pallet = palletRepository.findByPackagingAndDimensions(palletDto.getPackaging(),palletDto.getDimensions());
 
-        Pallet pallet = new Pallet();
-        pallet.setNumberOfStoriesInPallet(
+        if(pallet != null){
+            return new ResponseEntity<>("Pallet already exists", HttpStatus.CONFLICT);
+        }
+        Pallet newPallet = new Pallet();
+        newPallet.setNumberOfStoriesInPallet(
                 palletDto.getNumberOfStoriesInPallet()
         );
-        pallet.setNumberOfBoxesInCarton(
+        newPallet.setNumberOfBoxesInCarton(
                 palletDto.getNumberOfBoxesInCarton()
         );
 
-        pallet.setNumberOfCartonsInStory(
+        newPallet.setNumberOfCartonsInStory(
                 palletDto.getNumberOfCartonsInStory()
         );
-
         // Dimensions:
-        pallet.setDimensions(
+        newPallet.setDimensions(
                 palletDto.getDimensions()
         );
-
         // Preparation hours:
-        pallet.setPreparationTime(palletDto.getPreparationTime());
-        pallet.setPackaging(palletDto.getPackaging());
-        pallet.setTag(palletDto.getTag());
-
-        pallet.setTotalNet(
+        newPallet.setPreparationTime(palletDto.getPreparationTime());
+        newPallet.setPackaging(palletDto.getPackaging());
+        newPallet.setTag(palletDto.getTag());
+        newPallet.setTotalNet(
                 palletDto.getTotalNet()
         );
-        palletRepository.save(pallet);
-
-        return ResponseEntity.ok().body(pallet);
+        palletRepository.save(newPallet);
+        return ResponseEntity.ok().body(newPallet);
     }
 
 

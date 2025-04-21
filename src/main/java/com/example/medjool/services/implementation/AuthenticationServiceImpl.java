@@ -1,8 +1,6 @@
 package com.example.medjool.services.implementation;
 
-import com.example.medjool.dto.BearerTokenDto;
-import com.example.medjool.dto.LoginRequestDto;
-import com.example.medjool.dto.NewUserDto;
+import com.example.medjool.dto.*;
 import com.example.medjool.jwt.JwtUtilities;
 import com.example.medjool.model.Role;
 import com.example.medjool.model.RoleName;
@@ -37,7 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
-    public ResponseEntity authenticate(LoginRequestDto loginRequestDto) {
+    public ResponseEntity<?> authenticate(LoginRequestDto loginRequestDto) {
         Optional<User> optionalUser = userRepository.findByEmail(loginRequestDto.getEmail());
 
         if (optionalUser.isEmpty()) {
@@ -47,21 +45,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = optionalUser.get();
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword()) && user.isAccountNonLocked()) {
-            return new ResponseEntity("Invalid credentials", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
 
         LocalDateTime now = LocalDateTime.now();
+        AuthenticationResponseDto authenticationResponseDto = new AuthenticationResponseDto();
+
         String token = jwtUtilities.generateToken(user.getEmail(), user.getRole().getRoleName().toString());
         BearerTokenDto bearerTokenDto = new BearerTokenDto(token);
         user.setLastLogin(now);
         userRepository.save(user);
 
-        return new ResponseEntity<>(bearerTokenDto, HttpStatus.OK);
+        UserDetailsDto userDetailsDto = new UserDetailsDto(
+                user.getUserId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getRole().getRoleName().toString(),
+                user.isAccountNonLocked(),
+                user.getLastLogin()
+        );
+
+        authenticationResponseDto.setToken(token);
+        authenticationResponseDto.setUser(userDetailsDto);
+
+        return new ResponseEntity<>(authenticationResponseDto, HttpStatus.OK);
     }
 
 
-    public ResponseEntity<Object> createCredentials(NewUserDto newUserDto){
-
+    public ResponseEntity<?> createCredentials(NewUserDto newUserDto){
 
         // Check if the user already exists:
         Optional<User> user = userRepository.findByEmail(newUserDto.getEmail());
@@ -86,5 +98,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(newUser);
 
         return new ResponseEntity<>("NEW USER CREATED, WAITING FOR UNLOCKING THE ACCOUNT BY AN ADMIN...", HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<Object> logout(String token) {
+        return null;
     }
 }
