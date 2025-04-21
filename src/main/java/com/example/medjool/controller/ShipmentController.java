@@ -31,7 +31,7 @@ public class ShipmentController {
         shipmentService.updateShipmentTracker(shipmentId, trackingNumber);
     }
 
-    @DeleteMapping("/delete/shipmentId")
+    @DeleteMapping("/delete/{shipmentId}")
     public ResponseEntity<String> cancelShipment(@PathVariable long shipmentId) throws Exception {
         return shipmentService.cancelShipment(shipmentId);
     }
