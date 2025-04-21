@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +88,55 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         List<Client> clients = clientRepository.findAll();
         return new ResponseEntity<>(clients,HttpStatus.OK);
     }
+
+
+    // Update client information:
+    @Override
+    @Transactional
+    public ResponseEntity<Object> updateClient(Integer clientId, UpdateClientDto updateClientDto) {
+        Optional<Client> optionalClient = clientRepository.findById(clientId);
+        if (optionalClient.isEmpty()) {
+            return new ResponseEntity<>("Client not found", HttpStatus.NOT_FOUND);
+        }
+
+        Client client = optionalClient.get();
+
+        client.setCompanyName(updateClientDto.getNewCompanyName());
+        client.setGeneralManager(updateClientDto.getNewGeneralManager());
+        client.setCompanyActivity(updateClientDto.getNewCompanyActivity());
+
+        List<Address> newClientAddresses = new ArrayList<>();
+        for (var a : updateClientDto.getNewAddresses()) {
+            addressRepository.findById(a.getAddressId()).ifPresent(address -> {
+                address.setStreet(a.getStreet());
+                address.setCity(a.getCity());
+                address.setCountry(a.getCountry());
+                address.setState(a.getState());
+                address.setPostalCode(a.getZip());
+                addressRepository.save(address); // optional if cascade
+                newClientAddresses.add(address);
+            });
+        }
+
+        client.setAddresses(newClientAddresses);
+
+        List<Contact> newClientContacts = new ArrayList<>();
+        for (var c : updateClientDto.getNewContacts()) {
+            contactRepository.findById(c.getContactId()).ifPresent(contact -> {
+                contact.setEmail(c.getNewEmailAddress());
+                contact.setPhone(c.getNewPhoneNumber());
+                contact.setDepartment(c.getNewDepartmentName());
+                contactRepository.save(contact); // optional if cascade
+                newClientContacts.add(contact);
+            });
+        }
+
+        client.setContacts(newClientContacts);
+
+        clientRepository.save(client); // <- important
+        return new ResponseEntity<>("Client updated successfully", HttpStatus.OK);
+    }
+
 
     @Override
     public ResponseEntity<Object> deleteClient(Integer id) throws ClassNotFoundException {

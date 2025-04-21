@@ -3,6 +3,7 @@ package com.example.medjool.services;
 import com.example.medjool.dto.AddressResponseDto;
 import com.example.medjool.dto.ClientDto;
 import com.example.medjool.dto.PalletDto;
+import com.example.medjool.dto.UpdateClientDto;
 import com.example.medjool.model.Client;
 import com.example.medjool.model.Pallet;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ public interface ConfigurationService {
     ResponseEntity<Object> addClient(ClientDto clientDto);
 
     ResponseEntity<List<Client>> getAll();
+
+    ResponseEntity<Object> updateClient(Integer clientId, UpdateClientDto updateClientDto);
 
     ResponseEntity<Object> deleteClient(Integer id) throws ClassNotFoundException;
 
