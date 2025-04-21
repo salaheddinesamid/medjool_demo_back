@@ -24,6 +24,12 @@ public class Client {
     @Column(name = "company_activity")
     String companyActivity;
 
+    @Column(name = "SIRET")
+    private String SIRET;
+
+    @Column(name = "web_site")
+    private String webSite;
+
     @OneToMany
     List<Address> addresses;
 
