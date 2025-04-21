@@ -7,9 +7,11 @@ import com.example.medjool.model.OrderStatus;
 import com.example.medjool.model.Product;
 import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ProductRepository;
+import com.example.medjool.repository.SystemSettingRepository;
 import com.example.medjool.services.OverviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,12 +19,13 @@ public class OverviewServiceImpl implements OverviewService {
 
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
-
+    private final SystemSettingRepository systemSettingRepository;
     private final AlertServiceImpl alertService;
 
-    public OverviewServiceImpl(ProductRepository productRepository, OrderRepository orderRepository, AlertServiceImpl alertService) {
+    public OverviewServiceImpl(ProductRepository productRepository, OrderRepository orderRepository, SystemSettingRepository systemSettingRepository, AlertServiceImpl alertService) {
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
+        this.systemSettingRepository = systemSettingRepository;
         this.alertService = alertService;
     }
 
@@ -30,19 +33,22 @@ public class OverviewServiceImpl implements OverviewService {
     @Override
     public ResponseEntity<OverviewDto> getOverview() {
         OverviewDto overviewDto = new OverviewDto();
-
         Double totalStockWeight = 0d;
+
+
+        double MINIMUM_STOCK = systemSettingRepository.findByKey("min_stock_level").getValue();
+
 
         float total_revenue = 0f;
         for (Product product : productRepository.findAll()) {
-
-            if (product.getTotalWeight() <= 200){
+            totalStockWeight += product.getTotalWeight();
+            if (product.getTotalWeight() <= MINIMUM_STOCK) {
                 String content = "The product id: " + product.getProductId() + "is low stock";
                 if(!alertService.isExists(content)){
                     alertService.newAlert(content);
                 }
             }
-            totalStockWeight += product.getTotalWeight();
+
         }
 
         for (Order order : orderRepository.findAll()) {
