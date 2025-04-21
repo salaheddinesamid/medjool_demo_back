@@ -1,9 +1,6 @@
 package com.example.medjool.controller;
 
-import com.example.medjool.dto.AddressResponseDto;
-import com.example.medjool.dto.ClientDto;
-import com.example.medjool.dto.PalletDto;
-import com.example.medjool.dto.UserDetailsDto;
+import com.example.medjool.dto.*;
 import com.example.medjool.model.Client;
 import com.example.medjool.model.Pallet;
 import com.example.medjool.services.implementation.ConfigurationServiceImpl;
@@ -37,6 +34,11 @@ public class ConfigurationController {
     @DeleteMapping("client/delete/{clientId}")
     public ResponseEntity<Object> deleteClient(@PathVariable Integer clientId) throws ClassNotFoundException {
         return configurationService.deleteClient(clientId);
+    }
+
+    @PutMapping("client/update/{clientId}")
+    public ResponseEntity<Object> updateClient(@PathVariable Integer clientId, @RequestBody UpdateClientDto updateClientDto) {
+        return configurationService.updateClient(clientId, updateClientDto);
     }
 
     /*
