@@ -33,7 +33,7 @@ public class StockController {
     }
 
     @GetMapping("overview")
-    public ResponseEntity<OverviewDto> getStockOverview() {
+    public ResponseEntity<?> getStockOverview() {
         return overviewService.getOverview();
     }
 
