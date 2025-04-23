@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SystemSettingServiceImpl implements SystemSettingService {
@@ -22,16 +23,15 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     }
 
     @Override
-    public ResponseEntity<Object> updateMinProductLevel(double newMinProductLevel) {
-        SystemSetting setting = systemSettingRepository.findByKey("min_stock_level");
+    public ResponseEntity<?> updateMinProductLevel(double newMinProductLevel) {
 
-        if (setting != null) {
-            setting.setValue(newMinProductLevel);
-            systemSettingRepository.save(setting);
-            return ResponseEntity.ok("Minimum product level updated successfully.");
-        } else {
-            return ResponseEntity.status(404).body("Setting not found.");
-        }
+        return systemSettingRepository.findByKey("min_product_level")
+                .map(setting -> {
+                    setting.setValue(newMinProductLevel);
+                    systemSettingRepository.save(setting);
+                    return ResponseEntity.ok("Minimum product level updated successfully.");
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     public ResponseEntity<List<SettingDetailsDto>> getAllSettings(){
