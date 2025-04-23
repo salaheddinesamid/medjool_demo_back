@@ -36,14 +36,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Override
     public ResponseEntity<Object> addClient(ClientDto clientDto) {
 
-
         if(clientRepository.findByCompanyName(clientDto.getCompanyName())!=null){
             throw new ClientAlreadyFoundException();
         }
 
-
         Client client = new Client();
-
         // Set Client details
         client.setCompanyName(clientDto.getCompanyName());
 
@@ -106,32 +103,32 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         client.setGeneralManager(updateClientDto.getNewGeneralManager());
         client.setCompanyActivity(updateClientDto.getNewCompanyActivity());
 
-        List<Address> newClientAddresses = new ArrayList<>();
-        for (var a : updateClientDto.getNewAddresses()) {
-            addressRepository.findById(a.getAddressId()).ifPresent(address -> {
-                address.setStreet(a.getStreet());
-                address.setCity(a.getCity());
-                address.setCountry(a.getCountry());
-                address.setState(a.getState());
-                address.setPostalCode(a.getZip());
-                addressRepository.save(address); // optional if cascade
-                newClientAddresses.add(address);
-            });
-        }
+        List<Address> newClientAddresses = updateClientDto.getNewAddresses().stream().map(
+                addressDto -> {
+                    Address address = addressRepository.findById(addressDto.getAddressId()).orElse(null);
+                    assert address != null;
+                    address.setCity(addressDto.getCity());
+                    address.setCountry(addressDto.getCountry());
+                    address.setStreet(addressDto.getStreet());
+                    address.setState(addressDto.getState());
+                    address.setPostalCode(addressDto.getZip());
+                    return address;
+                }
+        ).toList();
+
 
         client.setAddresses(newClientAddresses);
 
-        List<Contact> newClientContacts = new ArrayList<>();
-        for (var c : updateClientDto.getNewContacts()) {
-            contactRepository.findById(c.getContactId()).ifPresent(contact -> {
-                contact.setEmail(c.getNewEmailAddress());
-                contact.setPhone(c.getNewPhoneNumber());
-                contact.setDepartment(c.getNewDepartmentName());
-                contactRepository.save(contact); // optional if cascade
-                newClientContacts.add(contact);
-            });
-        }
-
+        List<Contact> newClientContacts = updateClientDto.getNewContacts().stream().map(
+                contactDto -> {
+                    Contact contact = contactRepository.findById(contactDto.getContactId()).orElse(null);
+                    assert contact != null;
+                    contact.setEmail(contactDto.getNewEmailAddress());
+                    contact.setPhone(contactDto.getNewPhoneNumber());
+                    contact.setDepartment(contactDto.getNewDepartmentName());
+                    return contact;
+                }
+        ).toList();
         client.setContacts(newClientContacts);
 
         clientRepository.save(client); // <- important
@@ -192,27 +189,18 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             return new ResponseEntity<>("Pallet already exists", HttpStatus.CONFLICT);
         }
         Pallet newPallet = new Pallet();
-        newPallet.setNumberOfStoriesInPallet(
-                palletDto.getNumberOfStoriesInPallet()
-        );
-        newPallet.setNumberOfBoxesInCarton(
-                palletDto.getNumberOfBoxesInCarton()
-        );
+        newPallet.setNumberOfStoriesInPallet(palletDto.getNumberOfStoriesInPallet());
+        newPallet.setNumberOfBoxesInCarton(palletDto.getNumberOfBoxesInCarton());
 
-        newPallet.setNumberOfCartonsInStory(
-                palletDto.getNumberOfCartonsInStory()
-        );
+        newPallet.setNumberOfCartonsInStory(palletDto.getNumberOfCartonsInStory());
         // Dimensions:
-        newPallet.setDimensions(
-                palletDto.getDimensions()
-        );
+        newPallet.setDimensions(palletDto.getDimensions());
         // Preparation hours:
         newPallet.setPreparationTime(palletDto.getPreparationTime());
         newPallet.setPackaging(palletDto.getPackaging());
         newPallet.setTag(palletDto.getTag());
-        newPallet.setTotalNet(
-                palletDto.getTotalNet()
-        );
+        newPallet.setTotalNet(palletDto.getTotalNet());
+
         palletRepository.save(newPallet);
         return ResponseEntity.ok().body(newPallet);
     }
