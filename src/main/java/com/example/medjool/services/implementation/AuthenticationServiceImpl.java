@@ -11,6 +11,7 @@ import com.example.medjool.services.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,13 +37,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public ResponseEntity<?> authenticate(LoginRequestDto loginRequestDto) {
-        Optional<User> optionalUser = userRepository.findByEmail(loginRequestDto.getEmail());
 
-        if (optionalUser.isEmpty()) {
-            return new ResponseEntity<Object>("Invalid user", HttpStatus.UNAUTHORIZED);
+        User user = userRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(()-> new UsernameNotFoundException("User not found"));
+
+        if (user.isAccountNonLocked()) {
+            return new ResponseEntity<>("Account is locked", HttpStatus.UNAUTHORIZED);
         }
 
-        User user = optionalUser.get();
+
+
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword()) && user.isAccountNonLocked()) {
             return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
@@ -52,7 +55,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         AuthenticationResponseDto authenticationResponseDto = new AuthenticationResponseDto();
 
         String token = jwtUtilities.generateToken(user.getEmail(), user.getRole().getRoleName().toString());
-        BearerTokenDto bearerTokenDto = new BearerTokenDto(token);
+
+
         user.setLastLogin(now);
         userRepository.save(user);
 
