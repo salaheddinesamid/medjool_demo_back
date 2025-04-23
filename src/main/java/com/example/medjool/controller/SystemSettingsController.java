@@ -23,7 +23,7 @@ public class SystemSettingsController {
     }
 
     @PutMapping("/min_stock_level/update/")
-    public ResponseEntity<Object> updateMinStockLevel(@RequestParam double newMinStockLevel) throws Exception {
+    public ResponseEntity<?> updateMinStockLevel(@RequestParam double newMinStockLevel) throws Exception {
         return systemSettingService.updateMinProductLevel(newMinStockLevel);
 
     }
