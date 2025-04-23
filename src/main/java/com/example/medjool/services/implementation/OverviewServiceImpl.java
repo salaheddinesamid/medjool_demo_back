@@ -12,7 +12,6 @@ import com.example.medjool.repository.SystemSettingRepository;
 import com.example.medjool.services.OverviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
