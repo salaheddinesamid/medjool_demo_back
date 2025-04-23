@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -35,90 +36,63 @@ public class OrderServiceImpl implements OrderService{
 
     Logger logger = Logger.getLogger(OrderService.class.getName());
 
-    @Transactional
     @Override
-    public OrderResponseDto createOrder(OrderRequestDto orderRequest) throws Exception {
+    @Transactional
+    public OrderResponseDto createOrder(OrderRequestDto orderRequest) {
+        logger.info("New Order is being processed...");
 
+        Client client = Optional.ofNullable(clientRepository.findByCompanyName(orderRequest.getClientName()))
+                .filter(c -> c.getClientStatus().toString().equals("ACTIVE"))
+                .orElseThrow(ClientNotActiveException::new);
 
-        // Create new order object
         Order order = new Order();
-        LocalDateTime deliveryDate;
-
-
-        // Find the corresponding client
-        Client client = clientRepository.findByCompanyName(orderRequest.getClientName());
-        if(!client.getClientStatus().toString().equals("ACTIVE")) {
-            throw new ClientNotActiveException();
-        }
         order.setClient(client);
 
-        // Initiate the total price;
-        double totalPrice = 0;
-
-        // Initiate the total weight:
-        double totalWeight = 0;
-
-        double workingHours = 0;
-
-
-        logger.info("New Order is being processed...");
-        // Iterate over each order item
-        for (OrderItemRequestDto itemRequest : orderRequest.getItems()) {
-            Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getCallibre(),itemRequest.getColor(),itemRequest.getQuality());
-
-            Optional<Pallet> pallet = palletRepository.findById(itemRequest.getPalletId());
-            // Skip if product not found or insufficient stock
-            if (product == null){
-                throw new ProductNotFoundException();
+        List<OrderItem> orderItems = orderRequest.getItems().stream().map(item -> {
+            Product product = productRepository.findByCallibreAndColorAndQuality(
+                    item.getCallibre(), item.getColor(), item.getQuality()
+            );
+            if (product == null || product.getTotalWeight() < item.getItemWeight()) {
+                throw product == null ? new ProductNotFoundException() : new ProductLowStock();
             }
-            else if (product.getTotalWeight() < itemRequest.getItemWeight()){
-                throw new ProductLowStock();
-            }
-            // Update product inventory
 
-            logger.info("The product with id : " + product.getProductId() + "is being updated...");
-            product.setTotalWeight(product.getTotalWeight() - itemRequest.getItemWeight());
-            productRepository.save(product);
+            Pallet pallet = palletRepository.findById(item.getPalletId())
+                    .orElseThrow(() -> new RuntimeException("Pallet not found"));
 
-            // Create order item
+            product.setTotalWeight(product.getTotalWeight() - item.getItemWeight());
+
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
-            orderItem.setPricePerKg(itemRequest.getPricePerKg());
-            orderItem.setPackaging(itemRequest.getPackaging());
-            orderItem.setNumberOfPallets(itemRequest.getNumberOfPallets());
-            orderItem.setItemWeight(itemRequest.getItemWeight());
-            orderItem.setPallet(pallet.get());
+            orderItem.setPricePerKg(item.getPricePerKg());
+            orderItem.setPackaging(item.getPackaging());
+            orderItem.setNumberOfPallets(item.getNumberOfPallets());
+            orderItem.setItemWeight(item.getItemWeight());
+            orderItem.setPallet(pallet);
 
-            // Calculate the estimation delivery date:
-            workingHours += pallet.get().getPreparationTime();
+            // 🔥 Associate the order with the order item
+            orderItem.setOrder(order);
 
-            // Calculate totals
-            double itemPrice = itemRequest.getPricePerKg() * itemRequest.getItemWeight();
-            totalPrice += itemPrice;
-            totalWeight += itemRequest.getItemWeight();
-
-            order.addOrderItem(orderItem);
+            return orderItem;
+        }).toList();
 
 
+        productRepository.saveAll(orderItems.stream().map(OrderItem::getProduct).collect(Collectors.toList()));
 
-        }
+        double totalPrice = orderItems.stream().map(OrderItem::getPricePerKg).reduce(0.0, Double::sum);
+        double totalWeight = orderItems.stream().map(OrderItem::getItemWeight).reduce(0.0, Double::sum);
+        long estimatedDeliveryTime = orderItems.stream().map(item -> item.getPallet().getPreparationTime()).reduce(0.0, Double::sum).longValue();
+        order.setTotalPrice(totalPrice);
+        order.setTotalWeight(totalWeight);
 
-        // Only save if we have valid items
-        if (!order.getOrderItems().isEmpty()) {
-            LocalDateTime prod_date = LocalDateTime.now();
-            deliveryDate = LocalDateTime.now().plusHours((long) workingHours);
-            order.setTotalPrice(totalPrice);
-            order.setTotalWeight(totalWeight);
-            order.setStatus(OrderStatus.valueOf("PRELIMINARY"));
-            order.setProductionDate(prod_date);
-            order.setDeliveryDate(deliveryDate);
-            Order savedOrder = orderRepository.save(order);
+        order.setOrderItems(orderItems);
+        order.setProductionDate(LocalDateTime.now());
+        order.setStatus(OrderStatus.PRELIMINARY);
+        order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
+        Order savedOrder = orderRepository.save(order);
 
-            return new OrderResponseDto(savedOrder);
-        }
-
-        return null; // Or return empty order response
+        return new OrderResponseDto(savedOrder);
     }
+
 
 
     @Transactional(readOnly = true)
