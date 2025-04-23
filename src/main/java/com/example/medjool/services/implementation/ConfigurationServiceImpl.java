@@ -41,40 +41,41 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             throw new ClientAlreadyFoundException();
         }
 
+
         Client client = new Client();
-        List<Address> clientAddresses = new ArrayList<>();
-        List<Contact> clientContacts = new ArrayList<>();
 
-        // Create and save Addresses properly
-        for (AddressDto addressDto : clientDto.getAddresses()) {
-            Address address = new Address(); // Create a NEW instance for each address
-            address.setCity(addressDto.getCity());
-            address.setCountry(addressDto.getCountry());
-            address.setStreet(addressDto.getStreet());
-            address.setState(addressDto.getState());
-            address.setPostalCode(addressDto.getPostalCode());
-
-            // Save the address
-            address = addressRepository.save(address);
-            clientAddresses.add(address);
-        }
-
-        for (ContactDto contactDto : clientDto.getContacts()) {
-            // Create and save Contact
-            Contact contact = new Contact();
-            contact.setEmail(contactDto.getEmail());
-            contact.setPhone(contactDto.getPhone());
-            contact.setDepartment(contactDto.getDepartment());
-            contact = contactRepository.save(contact);
-            clientContacts.add(contact);
-        }
         // Set Client details
         client.setCompanyName(clientDto.getCompanyName());
-        client.setAddresses(clientAddresses);
-        client.setContacts(clientContacts);
+
         client.setCompanyActivity(clientDto.getCompanyActivity());
         client.setGeneralManager(clientDto.getGeneralManager());
         client.setClientStatus(ClientStatus.valueOf(clientDto.getStatus()));
+        List<Address> clientAddresses = clientDto
+                .getAddresses().stream().map(addressDto -> {
+                    Address address = new Address();
+                    address.setCity(addressDto.getCity());
+                    address.setCountry(addressDto.getCountry());
+                    address.setStreet(addressDto.getStreet());
+                    address.setState(addressDto.getState());
+                    address.setPostalCode(addressDto.getPostalCode());
+                    addressRepository.save(address);
+                    return address;
+                }).toList();
+
+        List<Contact> clientContacts = clientDto.getContacts().stream().map(
+                contactDto -> {
+                    Contact contact = new Contact();
+                    contact.setEmail(contactDto.getEmail());
+                    contact.setPhone(contactDto.getPhone());
+                    contact.setDepartment(contactDto.getDepartment());
+                    contactRepository.save(contact);
+                    return contact;
+                }
+        ).toList();
+
+        client.setAddresses(clientAddresses);
+        client.setContacts(clientContacts);
+
 
         // Save the client
         clientRepository.save(client);
