@@ -39,31 +39,30 @@ public class OverviewServiceImpl implements OverviewService {
         OverviewDto overviewDto = new OverviewDto();
 
         // Defensive check for system setting
-        Optional<SystemSetting> settingOpt = Optional.ofNullable(systemSettingRepository.findByKey(STOCK_KEY));
-        if (settingOpt.isEmpty()) {
-            return new ResponseEntity<>("System setting 'min_stock_level' not found", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        double minimumStockValue = systemSettingRepository.findByKey(STOCK_KEY)
+                .map(SystemSetting::getValue)
+                .orElseThrow(() -> new IllegalStateException("System setting 'min_stock_level' not found"));
 
-        double minimumStock = settingOpt.get().getValue();
-        double totalStockWeight = 0;
-        float totalRevenue = 0;
 
         List<Product> products = productRepository.findAll();
-        for (Product product : products) {
-            totalStockWeight += product.getTotalWeight();
+        double totalStockWeight = products.stream()
+                .mapToDouble(Product::getTotalWeight)
+                .peek(weight->{
+                    if(weight <= minimumStockValue){
+                        String alert = "The product id: " + weight + " is low stock";
+                        alertService.newAlert(alert);
+                    }
+                }).sum();
 
-            if (product.getTotalWeight() <= minimumStock) {
-                String alertContent = "The product id: " + product.getProductId() + " is low stock";
-                if (!alertService.isExists(alertContent)) {
-                    alertService.newAlert(alertContent);
-                }
-            }
-        }
+
+
 
         List<Order> orders = orderRepository.findAll();
-        for (Order order : orders) {
-            totalRevenue += (float) order.getTotalPrice(); // assuming getTotalPrice() is non-null
-        }
+
+        // Calculate total revenue
+        float totalRevenue = (float) orders.stream()
+                .mapToDouble(Order::getTotalPrice).sum();
+
 
         long totalOrders = orders.size();
         long totalReceivedOrders = orders.stream()
