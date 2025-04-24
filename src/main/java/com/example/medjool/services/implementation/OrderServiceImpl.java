@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -94,7 +93,6 @@ public class OrderServiceImpl implements OrderService{
     }
 
 
-
     @Transactional(readOnly = true)
     @Override
     public List<OrderResponseDto> getAllOrders() {
@@ -102,7 +100,6 @@ public class OrderServiceImpl implements OrderService{
                 .map(OrderResponseDto::new)
                 .collect(Collectors.toList());
     }
-
 
 
     @Transactional(readOnly = true)
@@ -150,7 +147,6 @@ public class OrderServiceImpl implements OrderService{
                 orderItem.setNumberOfPallets(itemRequest.getNewPalletId());
                 orderItem.setItemWeight(itemRequest.getNewWeight());
                 orderItem.setPallet(pallet.get());
-
             }
             // Set the new total price
             o.setTotalWeight(orderUpdateRequestDto.getTotalWeight());
