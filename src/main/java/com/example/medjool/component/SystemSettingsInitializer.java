@@ -1,4 +1,30 @@
 package com.example.medjool.component;
 
+import com.example.medjool.model.SystemSetting;
+import com.example.medjool.repository.SystemSettingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+@Component
 public class SystemSettingsInitializer {
+
+    private final SystemSettingRepository systemSettingRepository;
+
+    @Autowired
+    public SystemSettingsInitializer(SystemSettingRepository systemSettingRepository) {
+        this.systemSettingRepository = systemSettingRepository;
+    }
+
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void initialize() {
+        if(systemSettingRepository.findByKey("min_stock_level").isEmpty()){
+            SystemSetting minStockLevel = new SystemSetting();
+            minStockLevel.setKey("min_stock_level");
+            minStockLevel.setValue(10.0);
+            systemSettingRepository.save(minStockLevel);
+        }
+    }
 }
