@@ -77,6 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 
+    @Override
     public ResponseEntity<?> createCredentials(NewUserDto newUserDto){
 
         // Check if the user already exists:

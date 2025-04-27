@@ -25,15 +25,18 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     @Override
     public ResponseEntity<?> updateMinProductLevel(double newMinProductLevel) {
 
-        return systemSettingRepository.findByKey("min_product_level")
-                .map(setting -> {
-                    setting.setValue(newMinProductLevel);
-                    systemSettingRepository.save(setting);
-                    return ResponseEntity.ok("Minimum product level updated successfully.");
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Optional<SystemSetting> minProductLevel = systemSettingRepository.findByKey("min_stock_level");
+        if (minProductLevel.isPresent()) {
+            SystemSetting setting = minProductLevel.get();
+            setting.setValue(newMinProductLevel);
+            systemSettingRepository.save(setting);
+            return ResponseEntity.ok("Minimum product level updated successfully");
+        } else {
+            return ResponseEntity.status(404).body("Setting not found");
+        }
     }
 
+    @Override
     public ResponseEntity<List<SettingDetailsDto>> getAllSettings(){
         List<SystemSetting> settings = systemSettingRepository.findAll();
         List<SettingDetailsDto> settingDetailsDtos = settings.stream()

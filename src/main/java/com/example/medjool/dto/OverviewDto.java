@@ -8,6 +8,14 @@ public class OverviewDto
 
     Double totalStock;
     Long totalOrders;
+
+
+    double totalOrdersPreProduction;
+    double totalOrdersPostProduction;
     Long totalReceivedOrders;
-    Float totalRevenue;
+
+    double totalPreProductionRevenue;
+    double totalPostProductionRevenue;
+    double totalReceivedOrdersRevenue;
+    double totalRevenue;
 }

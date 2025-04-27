@@ -37,7 +37,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public OrderResponseDto createOrder(OrderRequestDto orderRequest) {
+    public ResponseEntity<?> createOrder(OrderRequestDto orderRequest) {
         logger.info("New Order is being processed...");
 
         Client client = Optional.ofNullable(clientRepository.findByCompanyName(orderRequest.getClientName()))
@@ -48,8 +48,9 @@ public class OrderServiceImpl implements OrderService{
         order.setClient(client);
 
         List<OrderItem> orderItems = orderRequest.getItems().stream().map(item -> {
-            Product product = productRepository.findByCallibreAndColorAndQuality(
-                    item.getCallibre(), item.getColor(), item.getQuality()
+            Product product = productRepository.findById(
+                    item.getProductId()
+            ).orElseThrow(() -> new ProductNotFoundException()
             );
             if (product == null || product.getTotalWeight() < item.getItemWeight()) {
                 throw product == null ? new ProductNotFoundException() : new ProductLowStock();
@@ -64,6 +65,7 @@ public class OrderServiceImpl implements OrderService{
             orderItem.setProduct(product);
             orderItem.setPricePerKg(item.getPricePerKg());
             orderItem.setPackaging(item.getPackaging());
+            orderItem.setOrderCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
             orderItem.setNumberOfPallets(item.getNumberOfPallets());
             orderItem.setItemWeight(item.getItemWeight());
             orderItem.setPallet(pallet);
@@ -77,7 +79,7 @@ public class OrderServiceImpl implements OrderService{
 
         productRepository.saveAll(orderItems.stream().map(OrderItem::getProduct).collect(Collectors.toList()));
 
-        double totalPrice = orderItems.stream().map(OrderItem::getPricePerKg).reduce(0.0, Double::sum);
+        double totalPrice = orderItems.stream().map(orderItem -> orderItem.getPricePerKg() * orderItem.getItemWeight()).reduce(0.0, Double::sum);
         double totalWeight = orderItems.stream().map(OrderItem::getItemWeight).reduce(0.0, Double::sum);
         long estimatedDeliveryTime = orderItems.stream().map(item -> item.getPallet().getPreparationTime()).reduce(0.0, Double::sum).longValue();
         order.setTotalPrice(totalPrice);
@@ -86,10 +88,11 @@ public class OrderServiceImpl implements OrderService{
         order.setOrderItems(orderItems);
         order.setProductionDate(LocalDateTime.now());
         order.setStatus(OrderStatus.PRELIMINARY);
+        order.setCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
         order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
         Order savedOrder = orderRepository.save(order);
 
-        return new OrderResponseDto(savedOrder);
+        return new ResponseEntity<>("Order has been created successfully.", HttpStatus.OK);
     }
 
 
@@ -123,7 +126,7 @@ public class OrderServiceImpl implements OrderService{
             double workingHours = 0;
 
             for (OrderItemUpdateRequestDto itemRequest : orderUpdateRequestDto.getUpdatedItems()) {
-                Product product = productRepository.findByCallibreAndColorAndQuality(itemRequest.getNewCallibre(), itemRequest.getNewColor(), itemRequest.getNewQuality());
+                Product product = productRepository.findById(itemRequest.getProductId()).orElse(null);
                 Optional<Pallet> pallet = palletRepository.findById(itemRequest.getNewPalletId());
                 // Skip if product not found or insufficient stock
                 if (product == null){

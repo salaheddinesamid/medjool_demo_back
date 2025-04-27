@@ -2,10 +2,7 @@ package com.example.medjool.services.implementation;
 
 
 import com.example.medjool.dto.OverviewDto;
-import com.example.medjool.model.Order;
-import com.example.medjool.model.OrderStatus;
-import com.example.medjool.model.Product;
-import com.example.medjool.model.SystemSetting;
+import com.example.medjool.model.*;
 import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ProductRepository;
 import com.example.medjool.repository.SystemSettingRepository;
@@ -15,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OverviewServiceImpl implements OverviewService {
@@ -43,38 +39,76 @@ public class OverviewServiceImpl implements OverviewService {
                 .map(SystemSetting::getValue)
                 .orElseThrow(() -> new IllegalStateException("System setting 'min_stock_level' not found"));
 
-
         List<Product> products = productRepository.findAll();
         double totalStockWeight = products.stream()
-                .mapToDouble(Product::getTotalWeight)
-                .peek(weight->{
-                    if(weight <= minimumStockValue){
-                        String alert = "The product id: " + weight + " is low stock";
+                .mapToDouble(product -> {
+                    double weight = product.getTotalWeight();
+                    if (weight <= minimumStockValue) {
+                        String alert = String.format("The product: %s is below the minimum stock level of %.2f", product.getProductId(), minimumStockValue);
                         alertService.newAlert(alert);
                     }
+                    return weight;
                 }).sum();
 
 
 
-
         List<Order> orders = orderRepository.findAll();
-
-        // Calculate total revenue
-        float totalRevenue = (float) orders.stream()
-                .mapToDouble(Order::getTotalPrice).sum();
-
-
         long totalOrders = orders.size();
-        long totalReceivedOrders = orders.stream()
-                .filter(order -> order.getStatus() == OrderStatus.RECEIVED)
-                .count();
+        double totalOrdersPreProduction = 0;
+        double totalOrdersPostProduction = 0;
+        long totalReceivedOrders = 0;
+        double totalReceivedRevenue = 0;
+        double totalPreProductionRevenue = 0;
+        double totalPostProductionRevenue = 0;
 
-        overviewDto.setTotalStock(totalStockWeight);
-        overviewDto.setTotalOrders(totalOrders);
-        overviewDto.setTotalReceivedOrders(totalReceivedOrders);
-        overviewDto.setTotalRevenue(totalRevenue);
 
-        return new ResponseEntity<>(overviewDto, HttpStatus.OK);
+       for(Order order : orders) {
+           if(order.getStatus().equals(OrderStatus.PRELIMINARY) ||
+                   order.getStatus().equals(OrderStatus.CONFIRMED)|| order.getStatus().equals(OrderStatus.SENT_TO_PRODUCTION)){
+               totalOrdersPreProduction += 1;
+               if(order.getCurrency().equals(OrderCurrency.USD)) {
+                     totalPreProductionRevenue += order.getTotalPrice() * 10.5;
+                } else if(order.getCurrency().equals(OrderCurrency.EUR)) {
+                     totalPreProductionRevenue += order.getTotalPrice() * 11;
+                } else if(order.getCurrency().equals(OrderCurrency.MAD)) {
+                     totalPreProductionRevenue += order.getTotalPrice();
+               }
+           }
+           else if (order.getStatus().equals(OrderStatus.READY_TO_SHIPPED) ||
+                   order.getStatus().equals(OrderStatus.IN_PRODUCTION) || order.getStatus().equals(OrderStatus.SHIPPED)) {
+               totalOrdersPostProduction += 1;
+               if(order.getCurrency().equals(OrderCurrency.USD)) {
+                     totalPostProductionRevenue += order.getTotalPrice() * 10.5;
+                } else if(order.getCurrency().equals(OrderCurrency.EUR)) {
+                     totalPostProductionRevenue += order.getTotalPrice() * 11;
+                } else if(order.getCurrency().equals(OrderCurrency.MAD)) {
+                     totalPostProductionRevenue += order.getTotalPrice();
+               }
+           }
+           else if (order.getStatus().equals(OrderStatus.RECEIVED)) {
+               totalReceivedOrders += 1;
+               if(order.getCurrency().equals(OrderCurrency.USD)) {
+                     totalReceivedRevenue += order.getTotalPrice() * 10.5;
+                } else if(order.getCurrency().equals(OrderCurrency.EUR)) {
+                     totalReceivedRevenue += order.getTotalPrice() * 11;
+                } else if(order.getCurrency().equals(OrderCurrency.MAD)) {
+                     totalReceivedRevenue += order.getTotalPrice();
+               }
+           }
+       }
+
+       overviewDto.setTotalStock(totalStockWeight);
+       overviewDto.setTotalOrders(totalOrders);
+       overviewDto.setTotalOrdersPreProduction(totalOrdersPreProduction);
+       overviewDto.setTotalOrdersPostProduction(totalOrdersPostProduction);
+       overviewDto.setTotalReceivedOrders(totalReceivedOrders);
+
+       overviewDto.setTotalPreProductionRevenue(totalPreProductionRevenue);
+       overviewDto.setTotalPostProductionRevenue(totalPostProductionRevenue);
+       overviewDto.setTotalReceivedOrdersRevenue(totalReceivedRevenue);
+
+       overviewDto.setTotalRevenue(totalPreProductionRevenue + totalPostProductionRevenue + totalReceivedRevenue);
+       return new ResponseEntity<>(overviewDto, HttpStatus.OK);
     }
 
 }

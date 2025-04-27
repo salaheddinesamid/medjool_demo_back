@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,10 @@ public class Order {
 
     @Column(name = "total_price", nullable = false)
     private double totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency")
+    private OrderCurrency currency;
 
     @Column(name = "total_weight", nullable = false)
     private double totalWeight;

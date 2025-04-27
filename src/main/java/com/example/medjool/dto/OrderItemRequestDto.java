@@ -2,18 +2,16 @@ package com.example.medjool.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class OrderItemRequestDto {
 
-    private String callibre;
-
-    private String color;
-
-    private String quality;
+    private String productId;
 
     private double pricePerKg;
 

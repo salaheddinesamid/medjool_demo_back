@@ -24,10 +24,12 @@ public class AlertServiceImpl implements AlertService {
     public void newAlert(String content) {
         Notification notification = new Notification();
         LocalDateTime now = LocalDateTime.now();
-        notification.setDate(now);
-        notification.setContent(content);
-        notification.setRead(false);
-        notificationRepository.save(notification);
+        if(!notificationRepository.existsByContent(notification.getContent())){
+            notification.setDate(now);
+            notification.setContent(content);
+            notification.setRead(false);
+            notificationRepository.save(notification);
+        }
     }
 
 

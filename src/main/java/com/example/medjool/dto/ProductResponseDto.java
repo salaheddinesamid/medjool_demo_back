@@ -7,9 +7,7 @@ import lombok.Data;
 @Data
 public class ProductResponseDto {
 
-    private Long id;
-
-    private String brand;
+    private String id;
 
     private String callibre;
 
@@ -25,7 +23,6 @@ public class ProductResponseDto {
 
     public ProductResponseDto(Product product) {
         this.id = product.getProductId();
-        this.brand = product.getBrand();
         this.callibre = product.getCallibre();
         this.totalWeight = product.getTotalWeight();
         this.color = product.getColor();

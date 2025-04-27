@@ -223,6 +223,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
 
+    @Override
     public ResponseEntity<Object> deletePallet(Integer palletId) {
         Pallet pallet = palletRepository.findById(palletId).orElseThrow(null);
         palletRepository.delete(pallet);

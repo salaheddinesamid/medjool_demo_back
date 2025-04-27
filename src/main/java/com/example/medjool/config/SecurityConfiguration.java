@@ -29,7 +29,7 @@ public class SecurityConfiguration {
                                         "/api/stock/**",
                                         "/api/overview/**",
                                         "/api/configuration/**",
-                                        "/api/system-settings/**",
+                                        "/api/settings/**",
                                         "/api/alert/**",
                                         "/api/user/**",
                                         "/api/notification/**",

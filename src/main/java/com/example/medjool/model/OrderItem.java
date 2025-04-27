@@ -23,8 +23,13 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @Enumerated(EnumType.STRING)
+    private OrderCurrency orderCurrency;
+
     @Column(name = "price_per_kg", nullable = false)
     private double pricePerKg;
+
+
 
     @Column(nullable = false)
     private double packaging;

@@ -11,11 +11,7 @@ import java.util.List;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
-
-    @Column(nullable = false)
-    private String brand;
+    private String productId;
 
     @Column(nullable = false)
     private String callibre;
@@ -49,4 +45,15 @@ public class Product {
             this.status = ProductStatus.NOT_AVAILABLE;
         }
     }
+
+    public void setProductId(String callibre, String quality, String color, String farm) {
+        String qualityCode = "" + quality.charAt(0) + quality.charAt(quality.length() - 1);
+        this.productId = String.format("%s_%s_%s_%s",
+                callibre.charAt(0),
+                qualityCode,
+                color.charAt(0),
+                farm.charAt(0)
+        );
+    }
+
 }

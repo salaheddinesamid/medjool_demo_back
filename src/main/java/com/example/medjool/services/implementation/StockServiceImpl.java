@@ -1,5 +1,6 @@
 package com.example.medjool.services.implementation;
 
+import com.example.medjool.dto.NewProductDto;
 import com.example.medjool.dto.ProductResponseDto;
 import com.example.medjool.model.Product;
 import com.example.medjool.repository.ProductRepository;
@@ -7,8 +8,8 @@ import com.example.medjool.services.StockService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class StockServiceImpl implements StockService {
         this.productRepository = productRepository;
     }
 
-    public Product getProduct(Long productId){
+    public Product getProduct(String productId){
         Optional<Product> product = productRepository.findById(productId);
         return product.orElse(null);
     }
@@ -51,18 +52,61 @@ public class StockServiceImpl implements StockService {
     // Upload a CSV file to update the stock
     @Override
     public ResponseEntity<Object> updateStock(MultipartFile file) throws IOException {
+        try (
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+                CSVParser csvParser = new CSVParser(bufferedReader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+        ) {
+            for (CSVRecord record : csvParser) {
+                String productId = record.get("product_id");
+                Optional<Product> optionalProduct = productRepository.findById(productId);
 
-        // Create a buffered reader:
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-        // Parse the csv:
-        CSVParser csvParser = new CSVParser(bufferedReader, CSVFormat.DEFAULT);
+                if (optionalProduct.isPresent()) {
+                    Product product = optionalProduct.get();
+                    product.setTotalWeight(Double.valueOf(record.get("quantity")));
+                    productRepository.save(product);
+                } else {
+                    // Optionally log or collect missing product IDs
+                    System.out.println("Product not found: " + productId);
+                }
+            }
 
-        for (CSVRecord record : csvParser) {
-            Product product = productRepository.findById(Long.valueOf(record.get("product_id"))).get();
-            product.setTotalWeight(Double.valueOf(record.get("New weight")));
-            productRepository.save(product);
+            return new ResponseEntity<>("Stock updated successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update stock: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @Override
+    public ResponseEntity<Object> createNewProduct(NewProductDto newProductDto) {
+        Product product = productRepository.findByCallibreAndColorAndQualityAndFarm(
+                newProductDto.getCallibre(),
+                newProductDto.getColor(),
+                newProductDto.getQuality(),
+                newProductDto.getFarm()
+        );
+
+        if (product != null) {
+            return new ResponseEntity<>("Product already exists", HttpStatus.BAD_REQUEST);
+        } else {
+            Product newProduct = new Product();
+            newProduct.setCallibre(newProductDto.getCallibre());
+            newProduct.setColor(newProductDto.getColor());
+            newProduct.setQuality(newProductDto.getQuality());
+            newProduct.setFarm(newProductDto.getFarm());
+            newProduct.setTotalWeight(newProductDto.getTotalWeight());
+
+            // Now generate product ID using the correctly set values
+            newProduct.setProductId(
+                    newProductDto.getCallibre(),
+                    newProductDto.getQuality(),
+                    newProductDto.getColor(),
+                    newProductDto.getFarm()
+            );
+
+            productRepository.save(newProduct);
+            return new ResponseEntity<>("New product created successfully", HttpStatus.OK);
+        }
     }
 
 }
