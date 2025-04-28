@@ -12,4 +12,9 @@ public class UserExceptionController {
     public ResponseEntity<Object> handleUserAccountCannotBeDeletedException(UserAccountCannotBeDeletedException ex) {
         return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<?> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
 }

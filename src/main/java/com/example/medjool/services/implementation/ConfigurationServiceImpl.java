@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +36,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     public ResponseEntity<Object> addClient(ClientDto clientDto) {
 
         if(clientRepository.findByCompanyName(clientDto.getCompanyName())!=null){
-            throw new ClientAlreadyFoundException();
+            throw new ClientAlreadyFoundException("Client already exists");
         }
 
         Client client = new Client();

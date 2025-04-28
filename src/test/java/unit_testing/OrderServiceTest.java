@@ -9,6 +9,7 @@ import com.example.medjool.repository.PalletRepository;
 import com.example.medjool.repository.ProductRepository;
 import com.example.medjool.services.implementation.OrderServiceImpl;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -26,9 +27,6 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
 
-    @InjectMocks
-    private OrderServiceImpl orderService;
-
     @Mock
     private ClientRepository clientRepository;
 
@@ -41,6 +39,15 @@ public class OrderServiceTest {
     @Mock
     private OrderRepository orderRepository;
 
+    @InjectMocks
+    private OrderServiceImpl orderService;
+
+    @BeforeEach
+    void setUp() {
+        // No need for MockitoAnnotations.openMocks(this);
+        // Mocks are initialized automatically by MockitoExtension
+    }
+
     @Test
     public void testCreateOrder_Success() {
         // Arrange
@@ -48,7 +55,7 @@ public class OrderServiceTest {
         orderRequest.setClientName("Fresh Fruits Inc");
 
         OrderItemRequestDto itemDto = new OrderItemRequestDto();
-        itemDto.setProductId("M_EA_B_M"); // Assuming valid product ID
+        itemDto.setProductId("M_EA_B_M");
         itemDto.setItemWeight(500.0);
         itemDto.setPalletId(1);
         itemDto.setPricePerKg(2.5);

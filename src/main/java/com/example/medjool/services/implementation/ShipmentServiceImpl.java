@@ -1,5 +1,6 @@
 package com.example.medjool.services.implementation;
 
+import com.example.medjool.dto.OrderResponseDto;
 import com.example.medjool.dto.ShipmentDetailsDto;
 import com.example.medjool.model.Order;
 import com.example.medjool.model.Shipment;
@@ -71,10 +72,12 @@ public class ShipmentServiceImpl implements ShipmentService {
         List<Shipment> shipments = shipmentRepository.findAll();
         return shipments.stream().map(shipment -> {
             ShipmentDetailsDto shipmentDetailsDto = new ShipmentDetailsDto();
+            Order order = shipment.getOrder();
+            OrderResponseDto orderResponseDto = new OrderResponseDto(order);
             shipmentDetailsDto.setShipmentId(shipment.getShipmentId());
             shipmentDetailsDto.setTrackingNumber(shipment.getTrackingNumber());
             shipmentDetailsDto.setTrackingUrl(shipment.getTrackingUrl());
-            shipmentDetailsDto.setOrderId(shipment.getOrder().getId());
+            shipmentDetailsDto.setOrderDetails(orderResponseDto);
             return shipmentDetailsDto;
         }).toList();
     }

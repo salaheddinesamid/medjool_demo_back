@@ -3,11 +3,14 @@ package unit_testing;
 import com.example.medjool.dto.AddressDto;
 import com.example.medjool.dto.ClientDto;
 import com.example.medjool.dto.ContactDto;
-import com.example.medjool.model.Address;
+import com.example.medjool.dto.PalletDto;
+import com.example.medjool.exception.ClientAlreadyFoundException;
 import com.example.medjool.model.Client;
+import com.example.medjool.model.Pallet;
 import com.example.medjool.repository.AddressRepository;
 import com.example.medjool.repository.ClientRepository;
 import com.example.medjool.repository.ContactRepository;
+import com.example.medjool.repository.PalletRepository;
 import com.example.medjool.services.implementation.ConfigurationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +31,9 @@ public class ConfigurationServiceTesting {
     private ClientRepository clientRepository;
 
     @Mock
+    private PalletRepository palletRepository;
+
+    @Mock
     private AddressRepository addressRepository;
 
     @Mock
@@ -42,7 +48,7 @@ public class ConfigurationServiceTesting {
     }
 
     @Test
-    void testCreateNewClient_AlreadyExists(){
+    void testCreateNewClient_AlreadyExists() throws ClientAlreadyFoundException {
         ClientDto clientDto = new ClientDto(
                 "Client1",
                 "GM",
@@ -61,11 +67,12 @@ public class ConfigurationServiceTesting {
 
         // Call the service method
 
-        ResponseEntity<Object> response = configurationService.addClient(clientDto);
 
-
-        assertEquals(409, response.getStatusCodeValue());
-        assertEquals("Client already exists", response.getBody());
+        ClientAlreadyFoundException exception =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        ClientAlreadyFoundException.class,
+                        () -> configurationService.addClient(clientDto)
+                );
 
     }
 
@@ -111,6 +118,31 @@ public class ConfigurationServiceTesting {
 
         // Verification
         assertEquals(201, response.getStatusCodeValue());
+    }
+
+
+    @Test
+    void createPallet_AlreadyExists(){
+        PalletDto palletDto = new PalletDto();
+        palletDto.setPackaging(1);
+        palletDto.setDimensions("180 x 120");
+        palletDto.setTag("Standard");
+        palletDto.setNumberOfStoriesInPallet(10);
+        palletDto.setNumberOfBoxesInCarton(20);
+        palletDto.setNumberOfCartonsInStory(2);
+        palletDto.setNotes("");
+
+        Pallet existedPallet = new Pallet();
+        when(palletRepository.findByPackagingAndDimensions(
+                palletDto.getPackaging(),
+                palletDto.getDimensions()
+        )).thenReturn(existedPallet);
+
+        // Call the service method:
+
+        ResponseEntity<Object> response = configurationService.addPallet(palletDto);
+
+        assertEquals(409, response.getStatusCodeValue());
     }
 
 

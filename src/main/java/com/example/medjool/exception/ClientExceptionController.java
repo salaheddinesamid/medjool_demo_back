@@ -16,8 +16,8 @@ public class ClientExceptionController {
 
     // Handle client duplicate
     @ExceptionHandler(ClientAlreadyFoundException.class)
-    public ResponseEntity<Object> clientAlreadyFound(){
-        return new ResponseEntity<>("Client already exists, can not create duplicate...",HttpStatus.CONFLICT);
+    public ResponseEntity<Object> clientAlreadyFound(ClientAlreadyFoundException ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.CONFLICT);
     }
 
     // Inactive clients are not allowed to make an order

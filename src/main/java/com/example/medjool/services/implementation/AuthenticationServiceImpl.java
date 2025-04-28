@@ -1,6 +1,7 @@
 package com.example.medjool.services.implementation;
 
 import com.example.medjool.dto.*;
+import com.example.medjool.exception.UserAlreadyExistsException;
 import com.example.medjool.jwt.JwtUtilities;
 import com.example.medjool.model.Role;
 import com.example.medjool.model.RoleName;
@@ -34,20 +35,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.roleRepository = roleRepository;
     }
 
-
     @Override
     public ResponseEntity<?> authenticate(LoginRequestDto loginRequestDto) {
 
-        User user = userRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow(()-> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findByEmail(loginRequestDto.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (user.isAccountNonLocked()) {
+        if (!user.isAccountNonLocked()) {
             return new ResponseEntity<>("Account is locked", HttpStatus.UNAUTHORIZED);
         }
 
-
-
-
-        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword()) && user.isAccountNonLocked()) {
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
             return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
         }
 
@@ -55,7 +53,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         AuthenticationResponseDto authenticationResponseDto = new AuthenticationResponseDto();
 
         String token = jwtUtilities.generateToken(user.getEmail(), user.getRole().getRoleName().toString());
-
 
         user.setLastLogin(now);
         userRepository.save(user);
@@ -77,6 +74,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 
+
     @Override
     public ResponseEntity<?> createCredentials(NewUserDto newUserDto){
 
@@ -84,7 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Optional<User> user = userRepository.findByEmail(newUserDto.getEmail());
 
         user.ifPresent(u->{
-            throw new RuntimeException("User already exists");
+            throw new UserAlreadyExistsException("User with this email already exists");
         });
 
         // Create new user:
