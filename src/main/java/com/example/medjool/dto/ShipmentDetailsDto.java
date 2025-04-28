@@ -7,6 +7,6 @@ public class ShipmentDetailsDto {
     private long shipmentId;
     private String trackingNumber;
     private String trackingUrl;
-    private long orderId;
+    private OrderResponseDto orderDetails;
 
 }
