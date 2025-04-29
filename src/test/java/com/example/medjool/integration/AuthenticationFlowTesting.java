@@ -1,4 +1,84 @@
 package com.example.medjool.integration;
 
+import com.example.medjool.MedjoolApplication;
+import com.example.medjool.dto.AuthenticationResponseDto;
+import com.example.medjool.dto.LoginRequestDto;
+import com.example.medjool.services.implementation.AuthenticationServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@SpringBootTest(classes = MedjoolApplication.class)
+@AutoConfigureMockMvc
 public class AuthenticationFlowTesting {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+
+    private final AuthenticationServiceImpl authenticationService;
+
+
+    @Autowired
+    public AuthenticationFlowTesting(AuthenticationServiceImpl authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+
+    @Test
+    void testLogin_ReturnsToken() throws Exception {
+        // Arrange
+        LoginRequestDto loginRequest = new LoginRequestDto();
+        loginRequest.setEmail("salaheddine.samid@medjoolstar.com");
+        loginRequest.setPassword("Salah");
+
+        // Act
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect((ResultMatcher) jsonPath("$.token").exists())
+                .andReturn();
+
+        // Optionally extract the token
+        String response = result.getResponse().getContentAsString();
+        AuthenticationResponseDto authResponse = objectMapper.readValue(response, AuthenticationResponseDto.class);
+        String token = authResponse.getToken();
+
+        assertNotNull(token);
+        System.out.println("JWT Token: " + token);
+    }
+
+    @Test
+    void testLogin_withInvalidCredentials() throws Exception {
+        // Implement the test logic here
+    }
+
+    @Test
+    void validJwt_grantAccess() throws Exception {
+        // Implement the test logic here
+    }
+
+    @Test
+    void invalidJwt_denyAccess() throws Exception {
+        // Implement the test logic here
+    }
+
+
 }
