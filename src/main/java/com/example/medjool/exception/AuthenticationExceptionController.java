@@ -10,7 +10,12 @@ public class AuthenticationExceptionController {
 
     @ExceptionHandler(UserAccountLockedException.class)
     public ResponseEntity<Object> userAccountLockedException(UserAccountLockedException e) {
-        return new ResponseEntity<>("User account is locked. Please contact support.", HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<?> invalidCredentialsException(InvalidCredentialsException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
