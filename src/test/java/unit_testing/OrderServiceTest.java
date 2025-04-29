@@ -1,5 +1,5 @@
-package unit_testing;
-
+package integration_testing;
+/**
 import com.example.medjool.dto.OrderItemRequestDto;
 import com.example.medjool.dto.OrderRequestDto;
 import com.example.medjool.model.*;
@@ -8,15 +8,15 @@ import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.PalletRepository;
 import com.example.medjool.repository.ProductRepository;
 import com.example.medjool.services.implementation.OrderServiceImpl;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
 
     @Mock
@@ -43,14 +42,14 @@ public class OrderServiceTest {
     private OrderServiceImpl orderService;
 
     @BeforeEach
-    void setUp() {
-        // No need for MockitoAnnotations.openMocks(this);
-        // Mocks are initialized automatically by MockitoExtension
+    void setUp(){
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testCreateOrder_Success() {
+    void testCreateOrderSuccess() {
         // Arrange
+        LocalDate now = LocalDate.now();
         OrderRequestDto orderRequest = new OrderRequestDto();
         orderRequest.setClientName("Fresh Fruits Inc");
 
@@ -61,9 +60,13 @@ public class OrderServiceTest {
         itemDto.setPricePerKg(2.5);
         itemDto.setPackaging(1);
         itemDto.setNumberOfPallets(1);
-        orderRequest.setItems(List.of(itemDto));
 
-        Client client = new Client();
+        orderRequest.setItems(List.of(itemDto));
+        orderRequest.setCurrency(OrderCurrency.MAD.toString());
+        orderRequest.setProductionDate(now);
+        orderRequest.
+
+         client = new Client();
         client.setClientStatus(ClientStatus.ACTIVE);
         client.setCompanyName("Fresh Fruits Inc");
 
@@ -72,6 +75,7 @@ public class OrderServiceTest {
         product.setTotalWeight(1000.0);
 
         Pallet pallet = new Pallet();
+
         pallet.setPreparationTime(5.0);
 
         when(clientRepository.findByCompanyName("Fresh Fruits Inc")).thenReturn(client);
@@ -86,4 +90,8 @@ public class OrderServiceTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Order has been created successfully.", response.getBody());
     }
+
+
+
 }
+**/

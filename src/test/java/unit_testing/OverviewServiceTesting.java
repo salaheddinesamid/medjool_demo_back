@@ -1,4 +1,4 @@
-package unit_testing;
+package integration_testing;
 
 public class OverviewServiceTesting {
 }

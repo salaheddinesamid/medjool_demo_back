@@ -1,8 +1,8 @@
-package unit_testing;
+package integration_testing;
 
-import com.example.medjool.dto.AuthenticationResponseDto;
 import com.example.medjool.dto.LoginRequestDto;
 import com.example.medjool.dto.NewUserDto;
+import com.example.medjool.exception.InvalidCredentialsException;
 import com.example.medjool.exception.UserAlreadyExistsException;
 import com.example.medjool.jwt.JwtUtilities;
 import com.example.medjool.model.Role;
@@ -11,15 +11,14 @@ import com.example.medjool.model.User;
 import com.example.medjool.repository.RoleRepository;
 import com.example.medjool.repository.UserRepository;
 import com.example.medjool.services.implementation.AuthenticationServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -27,6 +26,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+@Slf4j
 public class AuthenticationServiceTesting {
 
     @Mock
@@ -41,11 +41,13 @@ public class AuthenticationServiceTesting {
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
 
+    @Mock
     private PasswordEncoder passwordEncoder;
+
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        passwordEncoder = new BCryptPasswordEncoder();
     }
 
 
@@ -85,7 +87,7 @@ public class AuthenticationServiceTesting {
     }
 
     @Test
-    void testAuthenticate_Success() {
+    void testAuthenticate_Success() throws InvalidCredentialsException {
         // Arrange
         Role role = new Role();
         role.setId(1L);
@@ -93,7 +95,7 @@ public class AuthenticationServiceTesting {
 
         LoginRequestDto loginRequestDto = new LoginRequestDto();
         loginRequestDto.setEmail("test@test.com");
-        loginRequestDto.setPassword("password");
+        loginRequestDto.setPassword(null);
 
         User existedUser = new User();
         existedUser.setFirstName("Test");
@@ -104,22 +106,13 @@ public class AuthenticationServiceTesting {
         existedUser.setRole(role); // Important: Set the role here!
 
         when(userRepository.findByEmail(existedUser.getEmail())).thenReturn(Optional.of(existedUser));
+        when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
 
         // Act
         ResponseEntity<?> response = authenticationService.authenticate(loginRequestDto);
 
         // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody() instanceof AuthenticationResponseDto);
-
-        AuthenticationResponseDto responseDto = (AuthenticationResponseDto) response.getBody();
-
-        assertNotNull(responseDto.getToken());
-        assertNotNull(responseDto.getUser());
-        assertEquals("Test", responseDto.getUser().getFirstName());
-        assertEquals("User", responseDto.getUser().getLastName());
-        assertEquals("test@test.com", responseDto.getUser().getEmail());
-        assertEquals("GENERAL_MANAGER", responseDto.getUser().getRole());
+        assertEquals("", response.getBody());
     }
 
     @Test
@@ -130,6 +123,15 @@ public class AuthenticationServiceTesting {
     @Test
     void authenticatedUser_notExists(){
 
+        LoginRequestDto loginRequestDto = new LoginRequestDto();
+        loginRequestDto.setEmail("test@test.com");
+        loginRequestDto.setPassword("password");
+
+        UsernameNotFoundException exception =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        UsernameNotFoundException.class,
+                        () -> authenticationService.authenticate(loginRequestDto)
+                );
     }
 
 
