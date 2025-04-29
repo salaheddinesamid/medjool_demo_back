@@ -1,4 +1,4 @@
-package integration_testing;
+package unit_testing;
 
 import com.example.medjool.dto.LoginRequestDto;
 import com.example.medjool.dto.NewUserDto;
