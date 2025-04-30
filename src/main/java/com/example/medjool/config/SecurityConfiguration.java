@@ -26,16 +26,16 @@ public class SecurityConfiguration {
                         .authorizeHttpRequests(authorizeRequests ->
                                 authorizeRequests.requestMatchers("/api/order/**",
                                         "/api/auth/**",
-                                        "/api/stock/**",
                                         "/api/overview/**",
                                         "/api/configuration/**",
                                         "/api/settings/**",
                                         "/api/alert/**",
                                         "/api/user/**",
                                         "/api/notification/**",
-                                                "/api/shipment/**",
+                                        "/api/shipment/**",
                                         "/swagger-ui/**",
-                                        "/api-docs/**"
+                                        "/api-docs/**",
+                                        "/api/stock/**"
                                                 ).permitAll()
 
                         )

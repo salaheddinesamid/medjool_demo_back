@@ -30,7 +30,6 @@ public class OrderItem {
     private double pricePerKg;
 
 
-
     @Column(nullable = false)
     private double packaging;
 

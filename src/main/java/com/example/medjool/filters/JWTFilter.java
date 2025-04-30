@@ -50,7 +50,7 @@ public class JWTFilter extends OncePerRequestFilter {
             }
 
             else if(userDetails != null && !userDetails.isAccountNonLocked()) {
-                throw new UserAccountLockedException();
+                throw new UserAccountLockedException("User account is locked");
             }
             else {
                 throw new UserNotFoundException();

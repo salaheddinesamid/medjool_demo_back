@@ -1,6 +1,8 @@
 package com.example.medjool.services.implementation;
 
 import com.example.medjool.dto.*;
+import com.example.medjool.exception.InvalidCredentialsException;
+import com.example.medjool.exception.UserAccountLockedException;
 import com.example.medjool.exception.UserAlreadyExistsException;
 import com.example.medjool.jwt.JwtUtilities;
 import com.example.medjool.model.Role;
@@ -42,11 +44,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (!user.isAccountNonLocked()) {
-            return new ResponseEntity<>("Account is locked", HttpStatus.UNAUTHORIZED);
+            throw new UserAccountLockedException("User account is locked");
         }
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
-            return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
+            throw new InvalidCredentialsException("Invalid credentials,please try again");
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -96,7 +98,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         newUser.setEmail(newUserDto.getEmail());
         newUser.setRole(role);
         newUser.setPassword(passwordEncoder.encode(newUserDto.getPassword()));
-        newUser.setAccountNonLocked(false);
+        newUser.setAccountNonLocked(newUserDto.isAccountLocked());
         newUser.setEnabled(true);
         userRepository.save(newUser);
 
