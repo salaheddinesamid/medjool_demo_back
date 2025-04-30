@@ -2,16 +2,22 @@ package com.example.medjool.services.implementation;
 
 import com.example.medjool.dto.*;
 import com.example.medjool.exception.ClientNotActiveException;
+
 import com.example.medjool.exception.OrderCannotBeCanceledException;
 import com.example.medjool.exception.ProductLowStock;
+
 import com.example.medjool.exception.ProductNotFoundException;
 import com.example.medjool.model.*;
+
 import com.example.medjool.repository.*;
 import com.example.medjool.services.OrderService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -176,7 +182,9 @@ public class OrderServiceImpl implements OrderService{
 
         }
 
-        if(order.getStatus() == OrderStatus.IN_PRODUCTION && orderStatusDto.getNewStatus().equals("CANCELED")){
+        if(order.getStatus() == OrderStatus.IN_PRODUCTION && orderStatusDto.getNewStatus().equals("CANCELED") ||
+        order.getStatus() == OrderStatus.READY_TO_SHIPPED && orderStatusDto.getNewStatus().equals("CANCELED") ||
+        order.getStatus() == OrderStatus.SHIPPED && orderStatusDto.getNewStatus().equals("CANCELED")){
             throw new OrderCannotBeCanceledException();
         }
 
@@ -214,7 +222,6 @@ public class OrderServiceImpl implements OrderService{
         else if(order.getStatus() == OrderStatus.RECEIVED || order.getStatus() == OrderStatus.CANCELED){
             return new ResponseEntity<>("Order is already received and can not be canceled...", HttpStatus.CONFLICT);
         }
-
 
         for (OrderItem orderItem : order.getOrderItems()) {
             Product product = orderItem.getProduct();

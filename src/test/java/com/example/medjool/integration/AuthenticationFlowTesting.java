@@ -2,10 +2,14 @@ package com.example.medjool.integration;
 
 import com.example.medjool.MedjoolApplication;
 import com.example.medjool.dto.AuthenticationResponseDto;
+
+
 import com.example.medjool.dto.LoginRequestDto;
 import com.example.medjool.services.implementation.AuthenticationServiceImpl;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -68,11 +73,46 @@ public class AuthenticationFlowTesting {
     @Test
     void testLogin_withInvalidCredentials() throws Exception {
         // Implement the test logic here
+
+        LoginRequestDto loginRequestDto = new LoginRequestDto();
+        loginRequestDto.setEmail("salaheddine.samid@medjoolstar.com");
+        loginRequestDto.setPassword("1234");
+
+        // Act
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequestDto)))
+                .andExpect(status().isUnauthorized()).andReturn();
+
     }
 
     @Test
     void validJwt_grantAccess() throws Exception {
-        // Implement the test logic here
+        // Arrange
+        LoginRequestDto loginRequest = new LoginRequestDto();
+        loginRequest.setEmail("salaheddine.samid@medjoolstar.com");
+        loginRequest.setPassword("Salah");
+
+        // Authenticate
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // Extract the JWT token
+        String response = result.getResponse().getContentAsString();
+        AuthenticationResponseDto authResponse = objectMapper.readValue(response, AuthenticationResponseDto.class);
+        String token = authResponse.getToken();
+
+
+        // Access to the endpoint
+        MvcResult accessResponse = mockMvc.perform(get("/api/stock/get_all")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andReturn();
     }
 
     @Test
