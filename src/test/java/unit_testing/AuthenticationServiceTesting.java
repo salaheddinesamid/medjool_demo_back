@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -42,6 +43,9 @@ public class AuthenticationServiceTesting {
     private AuthenticationServiceImpl authenticationService;
 
     @Mock
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @InjectMocks
     private PasswordEncoder passwordEncoder;
 
 
@@ -133,6 +137,4 @@ public class AuthenticationServiceTesting {
                         () -> authenticationService.authenticate(loginRequestDto)
                 );
     }
-
-
 }
