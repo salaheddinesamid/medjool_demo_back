@@ -25,6 +25,15 @@ public class Pallet {
     @Column(name = "number_of_stories_in_pallet")
     private Integer numberOfStoriesInPallet;
 
+    @Column(name = "height")
+    private float height;
+
+    @Column(name = "width")
+    private float width;
+
+    @Column(name = "length")
+    private float length;
+
     @Column(name = "total_net")
     private Float totalNet;
 
