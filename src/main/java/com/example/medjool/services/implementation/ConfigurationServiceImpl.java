@@ -129,8 +129,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                 }
         ).toList();
         client.setContacts(newClientContacts);
-
-        clientRepository.save(client); // <- important
         return new ResponseEntity<>("Client updated successfully", HttpStatus.OK);
     }
 
@@ -182,18 +180,23 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     // -------------------------- Pallet Configuration Service ---------------------------
     @Override
     public ResponseEntity<Object> addPallet(PalletDto palletDto) {
-        Pallet pallet = palletRepository.findByPackagingAndDimensions(palletDto.getPackaging(),palletDto.getDimensions());
+        /**Pallet pallet = palletRepository.findByPackaging(palletDto.getPackaging());
 
         if(pallet != null){
             return new ResponseEntity<>("Pallet already exists", HttpStatus.CONFLICT);
-        }
+        }**/
         Pallet newPallet = new Pallet();
         newPallet.setNumberOfStoriesInPallet(palletDto.getNumberOfStoriesInPallet());
         newPallet.setNumberOfBoxesInCarton(palletDto.getNumberOfBoxesInCarton());
 
         newPallet.setNumberOfCartonsInStory(palletDto.getNumberOfCartonsInStory());
         // Dimensions:
-        newPallet.setDimensions(palletDto.getDimensions());
+
+        newPallet.setHeight(palletDto.getHeight());
+        newPallet.setWidth(palletDto.getWidth());
+        newPallet.setLength(palletDto.getLength());
+
+
         // Preparation hours:
         newPallet.setPreparationTime(palletDto.getPreparationTime());
         newPallet.setPackaging(palletDto.getPackaging());

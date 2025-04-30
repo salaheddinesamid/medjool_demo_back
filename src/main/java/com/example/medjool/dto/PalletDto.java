@@ -9,7 +9,11 @@ public class PalletDto {
     Integer numberOfBoxesInCarton;
     Integer numberOfCartonsInStory;
     Integer numberOfStoriesInPallet;
-    String dimensions;
+
+    float height;
+    float width;
+    float length;
+
     Float totalNet;
     float preparationTime;
     String tag;
