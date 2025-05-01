@@ -37,9 +37,10 @@ public class SecurityConfiguration {
                                         "/api/notification/**",
                                         "/api/shipment/**",
                                         "/swagger-ui/**",
-                                        "/api-docs/**",
-                                        "/api/stock/**"
+                                        "/api-docs/**"
+
                                                 ).permitAll()
+                                        .requestMatchers("/security-test/**","/api/stock/**").hasAnyAuthority("GENERAL_MANAGER","SALES")
 
                         )
 
