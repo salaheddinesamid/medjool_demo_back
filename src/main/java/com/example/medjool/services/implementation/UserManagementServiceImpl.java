@@ -1,5 +1,6 @@
 package com.example.medjool.services.implementation;
 
+import com.example.medjool.dto.NewPasswordDto;
 import com.example.medjool.dto.UserDetailsDto;
 import com.example.medjool.exception.UserAccountCannotBeDeletedException;
 import com.example.medjool.model.User;
@@ -92,6 +93,28 @@ public class UserManagementServiceImpl implements UserManagementService {
             return new ResponseEntity<>("User account deleted", HttpStatus.OK);
         }catch (UserAccountCannotBeDeletedException e){
             return new ResponseEntity<>("User account cannot be deleted", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> resetUserPassword(Long id, NewPasswordDto newPassword) {
+        Optional<User> user = userRepository.findById(id);
+
+        if(user.isPresent()) {
+            User u = user.get();
+            if(u.getPassword().equals(newPassword.getNewPassword())) {
+                return new ResponseEntity<>("New password cannot be the same as the old password", HttpStatus.BAD_REQUEST);
+            } else if(u.getPassword().equals(newPassword.getOldPassword())) {
+                u.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
+                userRepository.save(u);
+                return new ResponseEntity<>("User password updated", HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<>("Old password is incorrect", HttpStatus.BAD_REQUEST);
+            }
+        }
+        else{
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
     }
 }
