@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -120,19 +121,12 @@ public class ConfigurationServiceTesting {
 
     @Test
     void createPallet_AlreadyExists(){
-        PalletDto palletDto = new PalletDto();
-        palletDto.setPackaging(1);
-        palletDto.setDimensions("180 x 120");
-        palletDto.setTag("Standard");
-        palletDto.setNumberOfStoriesInPallet(10);
-        palletDto.setNumberOfBoxesInCarton(20);
-        palletDto.setNumberOfCartonsInStory(2);
-        palletDto.setNotes("");
+        PalletDto palletDto = new PalletDto(1,20,2,10,100,100,20,500.0f,100,"Standard","");
 
-        Pallet existedPallet = new Pallet();
-        when(palletRepository.findByPackagingAndDimensions(
-                palletDto.getPackaging(),
-                palletDto.getDimensions()
+        Pallet existedPallet = new Pallet(1,1,20,2,10,100,20,100,500.0f,"Standard","",100);
+
+        when(palletRepository.findByPackaging(
+                palletDto.getPackaging()
         )).thenReturn(existedPallet);
 
         // Call the service method:
@@ -147,19 +141,11 @@ public class ConfigurationServiceTesting {
 
         String companyName = "Client1";
 
-        Address address = new Address();
-        address.setCountry("Morocco");
-        address.setStreet("Street 1");
-        address.setState("State");
-        address.setPostalCode("2300");
-        address.setCity("City");
-        address.setAddressId(1L);
+        Address address = new Address(1L, "Morocco", "Street 1", "State", "2300", "City");
 
-        Contact contact = new Contact();
-        contact.setContactId(1);
-        contact.setDepartment("D1");
-        contact.setEmail("contact@gmail.com");
-        contact.setPhone("079082");
+        when(addressRepository.findById(1L)).thenReturn(Optional.of(address));
+        Contact contact = new Contact(1,"D1","contact@gmail.com","079082");
+        when(contactRepository.findById(1)).thenReturn(Optional.of(contact));
 
         Client existedClient = new Client();
         existedClient.setCompanyName("Client1");
@@ -173,6 +159,35 @@ public class ConfigurationServiceTesting {
         ResponseEntity<List<AddressResponseDto>> response = configurationService.getClientAddressesByClientName(companyName);
         assertEquals(1, Objects.requireNonNull(response.getBody()).size());
     }
+
+
+    @Test
+    void testUpdateClientInformation_Success() {
+        // Mock address and contact
+        Address address = new Address(1L, "Morocco", "Street 1", "State", "2300", "City");
+        Contact contact = new Contact(1, "D1", "contact@gmail.com", "079082");
+        when(addressRepository.findById(1L)).thenReturn(java.util.Optional.of(address));
+        when(contactRepository.findById(1)).thenReturn(java.util.Optional.of(contact));
+        // Mock existing client
+        Client existedClient = new Client(1, "Client1", "GM", "Export and Import", "CC2233", "www.client1.com", List.of(address), List.of(contact), ClientStatus.ACTIVE);
+        when(clientRepository.findById(1)).thenReturn(java.util.Optional.of(existedClient));
+
+        // Mock updated client
+        UpdateAddressDto updateAddressDto = new UpdateAddressDto(1L, "Algeria", "Street 20", "State", "3900", "Oran");
+        UpdateContactDto updateContactDto = new UpdateContactDto(1, "FN", "", "contact@outlook.com");
+        UpdateClientDto updateClientDto = new UpdateClientDto("Mafriq Limited", "Samid", "Export and Import", List.of(updateAddressDto), List.of(updateContactDto));
+
+        // Simulate save behavior
+        when(clientRepository.save(existedClient)).thenReturn(existedClient);
+
+        // Call the service method
+        ResponseEntity<Object> response = configurationService.updateClient(1, updateClientDto);
+
+        // Verification
+        assertEquals(200, response.getStatusCodeValue());
+    }
+
+
 
 
 

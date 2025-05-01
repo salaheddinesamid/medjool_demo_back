@@ -2,61 +2,91 @@ package com.example.medjool.jwt;
 
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.stereotype.Service;
-
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import java.util.Date;
-import java.util.logging.Logger;
+import java.util.function.Function;
 
-@Service
+@Slf4j
+@Component
 public class JwtUtilities {
 
-    private static final String SECRET_KEY = "A1B2C3D4E5F60718293A4B5C6D7E8F9012A3B4C5D6E7F8091A2B3C4D5E6F7A8B";
-    Logger log = Logger.getLogger(JwtUtilities.class.getName());
+    // Encryption key:
+    private final String secret = "385e7e7bf9074b975ccfb147a035696893be210c823250bf824cf61538176eda";
 
-    public String generateToken(String email, String role) {
-        return Jwts.builder()
-                .setSubject(email) // Set the subject of the token
-                .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .compact();
+    // Expiration time:
+    private Long jwtExpiration = 36000000L;
+
+    // Extract the username
+    public String extractUserName(String token){
+        return extractClaim(token, Claims::getSubject);
     }
 
-    // Extract the token
-    public String getToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
+    // Extract the claims
+    private <T> T extractClaim(String token, Function<Claims,T> claimsTFunction) {
+        final Claims claims = extractAllClaims(token);
+        return claimsTFunction.apply(claims);
+    }
+    private Claims extractAllClaims(String token){
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    // Extract the expiration date of the token
+    public Date extractExpiration(String token) { return
+            extractClaim(token, Claims::getExpiration);
+    }
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String email = extractUserName(token);
+        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    // Checks if the token is expired.
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    // Get the token from HTTP request.
+    public String getToken (HttpServletRequest httpServletRequest) {
+        final String bearerToken = httpServletRequest. getHeader("Authorization");
+        if(StringUtils.hasText(bearerToken) && bearerToken. startsWith("Bearer "))
+        {
+            return bearerToken.substring(7); } // The part after "Bearer "
         return null;
     }
 
-    // Extracts the email from the JWT token:
-    public String extractUserName(String token){
-        return Jwts
-                .parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    public boolean validateToken(String token){
-        try{
-            Jwts
-                    .parser().setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(token);
+    // Validate the token
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
             return true;
-        }catch (MalformedJwtException e) {
+        } catch (MalformedJwtException e) {
             log.info("Invalid JWT token.");
+            log.trace("Invalid JWT token trace: {}", e);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT token.");
+            log.trace("Expired JWT token trace: {}", e);
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT token.");
+            log.trace("Unsupported JWT token trace: {}", e);
         } catch (IllegalArgumentException e) {
-            log.info("JWT token compact of handler are invalid.");
+            log.info("JWT token compact of handler are invalid."); log.trace("JWT token compact of handler are invalid trace: {}", e);
         }
         return false;
     }
+
+    // Generate token for authenticated users
+    public String generateToken(String email, String role){
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("role",role)
+                .setExpiration(new Date(System.currentTimeMillis() + 360000))
+                .signWith(SignatureAlgorithm.HS256,secret)
+                .compact();
+    }
+
 }

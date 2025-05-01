@@ -87,6 +87,25 @@ public class AuthenticationFlowTesting {
     }
 
     @Test
+    void accessUnauthorizedEndpoint() throws Exception {
+
+        LoginRequestDto loginRequestDto = new LoginRequestDto();
+        loginRequestDto.setEmail("user@gmail.com");
+        loginRequestDto.setPassword("user");
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequestDto)))
+                .andExpect(status().isOk())
+                .andReturn();
+        String token = result.getResponse().getContentAsString();
+        System.out.println("JWT Token: " + token);
+        // Act
+        mockMvc.perform(get("/api/stock/get_all")
+                        .contentType(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void validJwt_grantAccess() throws Exception {
         // Arrange
         LoginRequestDto loginRequest = new LoginRequestDto();

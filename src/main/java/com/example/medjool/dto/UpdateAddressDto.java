@@ -1,9 +1,13 @@
 package com.example.medjool.dto;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UpdateAddressDto {
     private long addressId;
     private String country;

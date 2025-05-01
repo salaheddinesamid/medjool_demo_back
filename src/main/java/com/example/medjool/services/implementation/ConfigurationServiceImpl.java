@@ -181,11 +181,11 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     // -------------------------- Pallet Configuration Service ---------------------------
     @Override
     public ResponseEntity<Object> addPallet(PalletDto palletDto) {
-        /**Pallet pallet = palletRepository.findByPackaging(palletDto.getPackaging());
+        Pallet pallet = palletRepository.findByPackaging(palletDto.getPackaging());
 
         if(pallet != null){
             return new ResponseEntity<>("Pallet already exists", HttpStatus.CONFLICT);
-        }**/
+        }
         Pallet newPallet = new Pallet();
         newPallet.setNumberOfStoriesInPallet(palletDto.getNumberOfStoriesInPallet());
         newPallet.setNumberOfBoxesInCarton(palletDto.getNumberOfBoxesInCarton());

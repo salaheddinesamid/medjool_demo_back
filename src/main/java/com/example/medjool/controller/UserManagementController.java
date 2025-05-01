@@ -1,5 +1,6 @@
 package com.example.medjool.controller;
 
+import com.example.medjool.dto.NewPasswordDto;
 import com.example.medjool.dto.UserDetailsDto;
 import com.example.medjool.services.implementation.UserManagementServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,11 @@ public class UserManagementController {
     @PutMapping("/account/update/{userId}")
     public ResponseEntity<Object> updateUserDetails(@PathVariable long userId, @RequestBody UserDetailsDto userDetailsDto) {
         return userManagementService.updateUserDetails(userId, userDetailsDto);
+    }
+
+    @PutMapping("/account/password-reset/{userId}")
+    public ResponseEntity<Object> resetUserPassword(@PathVariable long userId, @RequestBody NewPasswordDto newPassword) {
+        return userManagementService.resetUserPassword(userId, newPassword);
     }
 
     @DeleteMapping("/account/delete/{userId}")

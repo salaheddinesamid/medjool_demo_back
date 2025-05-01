@@ -1,5 +1,6 @@
 package com.example.medjool.services;
 
+import com.example.medjool.dto.NewPasswordDto;
 import com.example.medjool.dto.UserDetailsDto;
 import org.springframework.http.ResponseEntity;
 
@@ -15,5 +16,5 @@ public interface UserManagementService {
     ResponseEntity<Object> updateUserDetails(Long id, UserDetailsDto userDetailsDto);
     ResponseEntity<Object> holdUserAccount(Long id);
     ResponseEntity<Object> deleteUserAccount(Long id);
-
+    ResponseEntity<Object> resetUserPassword(Long id, NewPasswordDto newPassword);
 }
