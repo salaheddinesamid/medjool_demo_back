@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
@@ -51,6 +52,7 @@ public class StockServiceImpl implements StockService {
 
     // Upload a CSV file to update the stock
     @Override
+    @Transactional
     public ResponseEntity<Object> updateStock(MultipartFile file) throws IOException {
         try (
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getInputStream()));
@@ -63,7 +65,6 @@ public class StockServiceImpl implements StockService {
                 if (optionalProduct.isPresent()) {
                     Product product = optionalProduct.get();
                     product.setTotalWeight(Double.valueOf(record.get("quantity")));
-                    productRepository.save(product);
                 } else {
                     // Optionally log or collect missing product IDs
                     System.out.println("Product not found: " + productId);
