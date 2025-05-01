@@ -133,6 +133,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
 
+
     @Override
     public ResponseEntity<Object> deleteClient(Integer id) throws ClassNotFoundException {
         Optional<Client> client = clientRepository.findById(id);

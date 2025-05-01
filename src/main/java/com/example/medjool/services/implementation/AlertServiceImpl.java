@@ -24,7 +24,7 @@ public class AlertServiceImpl implements AlertService {
     public void newAlert(String content) {
         Notification notification = new Notification();
         LocalDateTime now = LocalDateTime.now();
-        if(!notificationRepository.existsByContent(notification.getContent())){
+        if(!notificationRepository.existsByContent(content)){
             notification.setDate(now);
             notification.setContent(content);
             notification.setRead(false);
@@ -46,7 +46,6 @@ public class AlertServiceImpl implements AlertService {
         for(Notification notification : notificationRepository.findAll()) {
             notification.setRead(true);
             notificationRepository.save(notification);
-            notificationRepository.delete(notification);
         }
     }
 
