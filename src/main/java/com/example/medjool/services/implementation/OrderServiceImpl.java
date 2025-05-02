@@ -1,31 +1,24 @@
 package com.example.medjool.services.implementation;
-
 import com.example.medjool.dto.*;
 import com.example.medjool.exception.ClientNotActiveException;
-
 import com.example.medjool.exception.OrderCannotBeCanceledException;
 import com.example.medjool.exception.ProductLowStock;
-
 import com.example.medjool.exception.ProductNotFoundException;
 import com.example.medjool.model.*;
-
 import com.example.medjool.repository.*;
 import com.example.medjool.services.OrderService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -96,6 +89,8 @@ public class OrderServiceImpl implements OrderService{
         order.setStatus(OrderStatus.PRELIMINARY);
         order.setCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
         order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
+        order.setShippingAddress(orderRequest.getShippingAddress());
+
         Order savedOrder = orderRepository.save(order);
 
         return new ResponseEntity<>("Order has been created successfully.", HttpStatus.OK);
@@ -125,7 +120,7 @@ public class OrderServiceImpl implements OrderService{
         Optional<Order> order = orderRepository.findById(id);
         order.ifPresent(o -> {
             if(o.getStatus() == OrderStatus.READY_TO_SHIPPED){
-                throw new OrderCannotBeCanceledException();
+                throw new OrderCannotBeCanceledException("Order cannot be updated at this stage.");
             }
 
             // Calculate the new delivery date:
@@ -185,7 +180,7 @@ public class OrderServiceImpl implements OrderService{
         if(order.getStatus() == OrderStatus.IN_PRODUCTION && orderStatusDto.getNewStatus().equals("CANCELED") ||
         order.getStatus() == OrderStatus.READY_TO_SHIPPED && orderStatusDto.getNewStatus().equals("CANCELED") ||
         order.getStatus() == OrderStatus.SHIPPED && orderStatusDto.getNewStatus().equals("CANCELED")){
-            throw new OrderCannotBeCanceledException();
+            throw new OrderCannotBeCanceledException("Order cannot be canceled at this stage.");
         }
 
         if(orderStatusDto.getNewStatus().equals("CANCELED")){

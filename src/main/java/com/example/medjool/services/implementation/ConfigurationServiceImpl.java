@@ -154,6 +154,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                     addressResponseDto.setCountry(address.getCountry());
                     addressResponseDto.setStreet(address.getStreet());
                     addressResponseDto.setState(address.getState());
+                    addressResponseDto.setPostalCode(address.getPostalCode());
                     return addressResponseDto;
                 }).toList();
     }
