@@ -9,6 +9,6 @@ public class AddressResponseDto {
     private String country;
     private String city;
     private String state;
-    private String zip;
+    private String postalCode;
     private String street;
 }

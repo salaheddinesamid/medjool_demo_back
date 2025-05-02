@@ -17,5 +17,5 @@ public class OrderRequestDto {
     private List<OrderItemRequestDto> items;
     private String currency;
     private LocalDate productionDate;
-    private  ShippingDetailsDto shippingDetails;
+    private  String shippingAddress;
 }

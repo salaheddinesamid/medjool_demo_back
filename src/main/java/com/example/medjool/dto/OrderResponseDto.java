@@ -23,6 +23,8 @@ public class OrderResponseDto {
     private LocalDateTime productionDate;
     private LocalDateTime deliveryDate;
 
+    private String shippingAddress;
+
     public OrderResponseDto(Order order) {
         this.id = order.getId();
         this.clientName = order.getClient().getCompanyName();
@@ -35,5 +37,6 @@ public class OrderResponseDto {
                 .toList();
         this.productionDate = order.getProductionDate();
         this.deliveryDate = order.getDeliveryDate();
+        this.shippingAddress  = order.getShippingAddress();
     }
 }
