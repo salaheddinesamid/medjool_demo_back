@@ -42,6 +42,9 @@ public class Order {
     @Column(name = "delivery_date")
     private LocalDateTime deliveryDate;
 
+    @Column(name = "shipping_address")
+    private String shippingAddress;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 30) // optional, to avoid truncation for long enum names
     private OrderStatus status;
