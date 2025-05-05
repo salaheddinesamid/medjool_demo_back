@@ -27,6 +27,7 @@ public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
     private final ClientRepository clientRepository;
     private final PalletRepository palletRepository;
     private final ShipmentServiceImpl shipmentService;
@@ -47,31 +48,22 @@ public class OrderServiceImpl implements OrderService{
         order.setClient(client);
 
         List<OrderItem> orderItems = orderRequest.getItems().stream().map(item -> {
-            Product product = productRepository.findById(
-                    item.getProductId()
-            ).orElseThrow(() -> new ProductNotFoundException()
-            );
-            if (product == null || product.getTotalWeight() < item.getItemWeight()) {
-                throw product == null ? new ProductNotFoundException() : new ProductLowStock();
+            Product product = productRepository.findByProductCode(item.getProductCode())
+                    .orElseThrow(ProductNotFoundException::new);
+
+            if (product.getTotalWeight() < item.getItemWeight()) {
+                throw new ProductLowStock();
             }
 
             Pallet pallet = palletRepository.findById(item.getPalletId())
                     .orElseThrow(() -> new RuntimeException("Pallet not found"));
-
-            product.setTotalWeight(product.getTotalWeight() - item.getItemWeight());
-
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
+            orderItem.setItemWeight(item.getItemWeight());
             orderItem.setPricePerKg(item.getPricePerKg());
             orderItem.setPackaging(item.getPackaging());
-            orderItem.setOrderCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
             orderItem.setNumberOfPallets(item.getNumberOfPallets());
-            orderItem.setItemWeight(item.getItemWeight());
             orderItem.setPallet(pallet);
-
-            // 🔥 Associate the order with the order item
-            orderItem.setOrder(order);
-
             return orderItem;
         }).toList();
 
@@ -127,7 +119,7 @@ public class OrderServiceImpl implements OrderService{
             double workingHours = 0;
 
             for (OrderItemUpdateRequestDto itemRequest : orderUpdateRequestDto.getUpdatedItems()) {
-                Product product = productRepository.findById(itemRequest.getProductId()).orElse(null);
+                Product product = productRepository.findByProductCode(itemRequest.getProductCode()).get();
                 Optional<Pallet> pallet = palletRepository.findById(itemRequest.getNewPalletId());
                 // Skip if product not found or insufficient stock
                 if (product == null){
@@ -177,6 +169,10 @@ public class OrderServiceImpl implements OrderService{
 
         }
 
+        OrderHistoryDto orderHistoryDto = new OrderHistoryDto();
+        orderHistoryDto.setOrderId(id);
+        orderHistoryDto.setNewStatus(orderStatusDto.getNewStatus());
+
         if(order.getStatus() == OrderStatus.IN_PRODUCTION && orderStatusDto.getNewStatus().equals("CANCELED") ||
         order.getStatus() == OrderStatus.READY_TO_SHIPPED && orderStatusDto.getNewStatus().equals("CANCELED") ||
         order.getStatus() == OrderStatus.SHIPPED && orderStatusDto.getNewStatus().equals("CANCELED")){
@@ -197,6 +193,7 @@ public class OrderServiceImpl implements OrderService{
 
         order.setStatus(OrderStatus.valueOf(orderStatusDto.getNewStatus()));
         orderRepository.save(order);
+        addOrderHistory(orderHistoryDto);
         return ResponseEntity.ok().build();
     }
 
@@ -229,5 +226,78 @@ public class OrderServiceImpl implements OrderService{
         // No need to call orderRepository.save(order); for same reason
 
         return new ResponseEntity<>("Order has been cancelled.", HttpStatus.OK);
+    }
+
+    @Override
+    public void addOrderHistory(OrderHistoryDto orderHistoryDto) {
+        Order order = orderRepository.findById(orderHistoryDto.getOrderId()).orElse(null);
+        if (order == null) {
+            throw new IllegalArgumentException("Order not found for ID: " + orderHistoryDto.getOrderId());
+        }
+
+        OrderHistory orderHistory = orderHistoryRepository.findByOrderId(orderHistoryDto.getOrderId());
+        if (orderHistory == null) {
+            orderHistory = new OrderHistory();
+            orderHistory.setOrder(order);
+        }
+
+        switch (orderHistoryDto.getNewStatus()) {
+            case "CONFIRMED" -> {
+                if (orderHistory.getConfirmedAt() == null) {
+                    orderHistory.setConfirmedAt(LocalDateTime.now());
+                }
+            }
+            case "SENT_TO_PRODUCTION" -> {
+                if (orderHistory.getSentToProductionAt() == null) {
+                    orderHistory.setSentToProductionAt(LocalDateTime.now());
+                }
+            }
+            case "IN_PRODUCTION" -> {
+                if (orderHistory.getInProductionAt() == null) {
+                    orderHistory.setInProductionAt(LocalDateTime.now());
+                }
+            }
+            case "READY_TO_SHIPPED" -> {
+                if (orderHistory.getReadyToShipAt() == null) {
+                    orderHistory.setReadyToShipAt(LocalDateTime.now());
+                }
+            }
+            case "SHIPPED" -> {
+                if (orderHistory.getShippedAt() == null) {
+                    orderHistory.setShippedAt(LocalDateTime.now());
+                }
+            }
+            case "RECEIVED" -> {
+                if (orderHistory.getDeliveredAt() == null) {
+                    orderHistory.setDeliveredAt(LocalDateTime.now());
+                }
+            }
+            default -> throw new IllegalArgumentException("Invalid status: " + orderHistoryDto.getNewStatus());
+        }
+
+        orderHistoryRepository.save(orderHistory);
+        logger.info("Order history has been updated successfully.");
+    }
+
+    @Override
+    public ResponseEntity<List<OrderHistoryResponseDto>> getAllOrderHistory() {
+
+        List<OrderHistory> orderHistories = orderHistoryRepository.findAll();
+
+        List<OrderHistoryResponseDto> response = orderHistories.stream()
+                .map(orderHistory ->{
+                    OrderHistoryResponseDto orderHistoryResponseDto = new OrderHistoryResponseDto();
+                    orderHistoryResponseDto.setOrderNumber(orderHistory.getOrder().getId());
+                    orderHistoryResponseDto.setClientName(orderHistory.getOrder().getClient().getCompanyName());
+                    orderHistoryResponseDto.setConfirmedAt(orderHistory.getConfirmedAt());
+                    orderHistoryResponseDto.setSentToProductionAt(orderHistory.getSentToProductionAt());
+                    orderHistoryResponseDto.setInProductionAt(orderHistory.getInProductionAt());
+                    orderHistoryResponseDto.setReadyToShipAt(orderHistory.getReadyToShipAt());
+                    orderHistoryResponseDto.setShippedAt(orderHistory.getShippedAt());
+                    orderHistoryResponseDto.setDeliveredAt(orderHistory.getDeliveredAt());
+                    return orderHistoryResponseDto;
+                })
+                .toList();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

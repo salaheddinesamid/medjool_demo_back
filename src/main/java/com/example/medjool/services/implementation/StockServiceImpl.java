@@ -2,6 +2,7 @@ package com.example.medjool.services.implementation;
 
 import com.example.medjool.dto.NewProductDto;
 import com.example.medjool.dto.ProductResponseDto;
+import com.example.medjool.exception.ProductNotFoundException;
 import com.example.medjool.model.Product;
 import com.example.medjool.repository.ProductRepository;
 import com.example.medjool.services.StockService;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,13 +35,8 @@ public class StockServiceImpl implements StockService {
         this.productRepository = productRepository;
     }
 
-    public Product getProduct(String productId){
-        Optional<Product> product = productRepository.findById(productId);
-        return product.orElse(null);
-    }
-
     @Override
-    public List<ProductResponseDto> getAllProducts(){
+    public List<ProductResponseDto> getAllProducts() {
 
         System.out.println("👉 Fetching products from DB...");
         List<Product> products = productRepository.findAll();
@@ -59,15 +56,22 @@ public class StockServiceImpl implements StockService {
                 CSVParser csvParser = new CSVParser(bufferedReader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
         ) {
             for (CSVRecord record : csvParser) {
-                String productId = record.get("product_id");
-                Optional<Product> optionalProduct = productRepository.findById(productId);
+                System.out.println("Reading the row");
+                String productCode = record.get("product_code");
+                String rawWeight = record.get("total_weight");
+                System.out.println("Raw weight: " + rawWeight);
 
-                if (optionalProduct.isPresent()) {
-                    Product product = optionalProduct.get();
-                    product.setTotalWeight(Double.valueOf(record.get("quantity")));
+                String cleanedWeight = rawWeight.trim().replace(".", "").replace(",", ".");
+                System.out.println("Cleaned weight: " + cleanedWeight);
+
+                double totalWeight = Double.parseDouble(cleanedWeight);
+                Product product = productRepository.findByProductCode(productCode).orElseThrow(() -> new ProductNotFoundException());
+
+                if (product != null) {
+                    product.setTotalWeight(totalWeight);
                 } else {
                     // Optionally log or collect missing product IDs
-                    System.out.println("Product not found: " + productId);
+                    System.out.println("Product not found: " + productCode);
                 }
             }
 
@@ -97,17 +101,53 @@ public class StockServiceImpl implements StockService {
             newProduct.setFarm(newProductDto.getFarm());
             newProduct.setTotalWeight(newProductDto.getTotalWeight());
 
-            // Now generate product ID using the correctly set values
-            newProduct.setProductId(
-                    newProductDto.getCallibre(),
-                    newProductDto.getQuality(),
-                    newProductDto.getColor(),
-                    newProductDto.getFarm()
-            );
-
             productRepository.save(newProduct);
             return new ResponseEntity<>("New product created successfully", HttpStatus.OK);
         }
     }
 
+    @Override
+    public ResponseEntity<Object> initializeStock(MultipartFile file) throws IOException {
+        try (
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+                CSVParser csvParser = new CSVParser(bufferedReader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+        ) {
+            for (CSVRecord record : csvParser) {
+                String productCode = safeTrim(record.get("product_code"));
+                String callibre = safeTrim(record.get("Callibre"));
+                String color = safeTrim(record.get("Color"));
+                String quality = safeTrim(record.get("Quality"));
+                String farm = safeTrim(record.get("Farm"));
+                String brand = safeTrim(record.get("Brand"));
+
+                if (productCode == null || callibre == null || color == null ||
+                        quality == null || farm == null || brand == null) {
+                    return new ResponseEntity<>("Invalid CSV format: Missing required columns or values", HttpStatus.BAD_REQUEST);
+                }
+
+                Product newProduct = new Product();
+                newProduct.setProductCode(productCode);
+                newProduct.setCallibre(callibre);
+                newProduct.setColor(color);
+                newProduct.setQuality(quality);
+                newProduct.setFarm(farm);
+                newProduct.setTotalWeight(0.0); // Initialized with 0 weight
+
+                productRepository.save(newProduct);
+            }
+
+            return new ResponseEntity<>("Stock initialized successfully", HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Failed to process the file: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("An unexpected error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Utility method to trim and return null if empty
+    private String safeTrim(String value) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
 }
