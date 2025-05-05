@@ -52,6 +52,7 @@ public class ConfigurationServiceTesting {
                 "GM",
                 "Export and Import",
                 "www.client1.com",
+                "GMS",
                 null,
                 null,
                 "ACTIVE"
@@ -64,7 +65,6 @@ public class ConfigurationServiceTesting {
         )).thenReturn(existedClient);
 
         // Call the service method
-
 
         ClientAlreadyFoundException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
@@ -82,6 +82,7 @@ public class ConfigurationServiceTesting {
                 "GM",
                 "Export and Import",
                 "www.client1.com",
+                "GMS",
                 null,
                 null,
                 "ACTIVE"
@@ -169,7 +170,7 @@ public class ConfigurationServiceTesting {
         when(addressRepository.findById(1L)).thenReturn(java.util.Optional.of(address));
         when(contactRepository.findById(1)).thenReturn(java.util.Optional.of(contact));
         // Mock existing client
-        Client existedClient = new Client(1, "Client1", "GM", "Export and Import", "CC2233", "www.client1.com", List.of(address), List.of(contact), ClientStatus.ACTIVE);
+        Client existedClient = new Client(1, "Client1", "GM", "Export and Import", "CC2233", "www.client1.com", "GMS", List.of(address), List.of(contact), ClientStatus.ACTIVE);
         when(clientRepository.findById(1)).thenReturn(java.util.Optional.of(existedClient));
 
         // Mock updated client

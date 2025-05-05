@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class OrderItemResponseDto {
     private Long id;
-    private String productId;
+    private Long productId;
     private String callibre;
     private String quality;
     private String color;

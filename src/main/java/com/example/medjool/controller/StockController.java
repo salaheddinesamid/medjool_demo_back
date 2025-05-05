@@ -1,7 +1,6 @@
 package com.example.medjool.controller;
 
 import com.example.medjool.dto.NewProductDto;
-import com.example.medjool.dto.OverviewDto;
 import com.example.medjool.dto.ProductResponseDto;
 import com.example.medjool.services.implementation.OverviewServiceImpl;
 import com.example.medjool.services.implementation.StockServiceImpl;
@@ -46,6 +45,11 @@ public class StockController {
     @PutMapping("/update")
     public ResponseEntity<Object> updateStock(@RequestBody MultipartFile file) throws IOException {
         return stockService.updateStock(file);
+    }
+
+    @PostMapping("/initialize")
+    public ResponseEntity<Object> initializeStock(@RequestBody MultipartFile file) throws IOException {
+        return stockService.initializeStock(file);
     }
     
 }

@@ -1,4 +1,5 @@
 package unit_testing;
+
 import com.example.medjool.dto.OrderItemRequestDto;
 import com.example.medjool.dto.OrderRequestDto;
 
@@ -61,8 +62,20 @@ public class OrderServiceTest {
         OrderRequestDto orderRequest = new OrderRequestDto();
         orderRequest.setClientName("Fresh Fruits Inc");
 
+        Client client = new Client();
+        client.setClientStatus(ClientStatus.ACTIVE);
+        client.setCompanyName("Fresh Fruits Inc");
+
+        Product product = new Product();
+        product.setProductCode("M_EA_B_M");
+        product.setTotalWeight(1000.0);
+
+        Pallet pallet = new Pallet();
+        pallet.setPalletId(1);
+        pallet.setPreparationTime(5.0);
+
         OrderItemRequestDto itemDto = new OrderItemRequestDto();
-        itemDto.setProductId("M_EA_B_M");
+        itemDto.setProductCode("M_EA_B_M");
         itemDto.setItemWeight(500.0);
         itemDto.setPalletId(1);
         itemDto.setPricePerKg(2.5);
@@ -73,20 +86,8 @@ public class OrderServiceTest {
         orderRequest.setCurrency(OrderCurrency.MAD.toString());
         orderRequest.setProductionDate(now);
 
-        Client client = new Client();
-        client.setClientStatus(ClientStatus.ACTIVE);
-        client.setCompanyName("Fresh Fruits Inc");
-
-        Product product = new Product();
-        product.setProductId("M_EA_B_M");
-        product.setTotalWeight(1000.0);
-
-        Pallet pallet = new Pallet();
-
-        pallet.setPreparationTime(5.0);
-
         when(clientRepository.findByCompanyName("Fresh Fruits Inc")).thenReturn(client);
-        when(productRepository.findById("M_EA_B_M")).thenReturn(Optional.of(product));
+        when(productRepository.findByProductCode("M_EA_B_M")).thenReturn(Optional.of(product));
         when(palletRepository.findById(1)).thenReturn(Optional.of(pallet));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -106,7 +107,7 @@ public class OrderServiceTest {
         orderRequest.setClientName("Fresh Fruits Inc");
 
         OrderItemRequestDto itemDto = new OrderItemRequestDto();
-        itemDto.setProductId("M_EA_B_M");
+        itemDto.setProductCode("M_EA_B_M");
         itemDto.setItemWeight(500.0);
         itemDto.setPalletId(1);
         itemDto.setPricePerKg(2.5);
@@ -123,7 +124,7 @@ public class OrderServiceTest {
         client.setCompanyName("Fresh Fruits Inc");
 
         Product product = new Product();
-        product.setProductId("M_EA_B_M");
+        product.setProductCode("M_EA_B_M");
         product.setTotalWeight(1000.0);
 
         Pallet pallet = new Pallet();
@@ -131,7 +132,7 @@ public class OrderServiceTest {
         pallet.setPreparationTime(5.0);
 
         when(clientRepository.findByCompanyName("Fresh Fruits Inc")).thenReturn(client);
-        when(productRepository.findById("M_EA_B_M")).thenReturn(Optional.of(product));
+        when(productRepository.findByProductCode("M_EA_B_M")).thenReturn(Optional.of(product));
         when(palletRepository.findById(1)).thenReturn(Optional.of(pallet));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -152,7 +153,7 @@ public class OrderServiceTest {
         orderRequest.setClientName("Fresh Fruits Inc");
 
         OrderItemRequestDto itemDto = new OrderItemRequestDto();
-        itemDto.setProductId("M_EA_B_M");
+        itemDto.setProductCode("M_EA_B_M");
         itemDto.setItemWeight(500.0);
         itemDto.setPalletId(1);
         itemDto.setPricePerKg(2.5);
@@ -169,7 +170,7 @@ public class OrderServiceTest {
         client.setCompanyName("Fresh Fruits Inc");
 
         Product product = new Product();
-        product.setProductId("M_EA_B_M");
+        product.setProductCode("M_EA_B_M");
         product.setTotalWeight(1000.0);
 
         Pallet pallet = new Pallet();
@@ -201,7 +202,7 @@ public class OrderServiceTest {
         client.setCompanyName("Fresh Fruits Inc");
 
         Product product = new Product();
-        product.setProductId("M_EA_B_M");
+        product.setProductCode("M_EA_B_M");
         product.setTotalWeight(1000.0);
 
         Order order = new Order();
@@ -224,7 +225,7 @@ public class OrderServiceTest {
         pallet.setPreparationTime(5.0);
 
         when(clientRepository.findByCompanyName("Fresh Fruits Inc")).thenReturn(client);
-        when(productRepository.findById("M_EA_B_M")).thenReturn(Optional.of(product));
+        when(productRepository.findByProductCode("M_EA_B_M")).thenReturn(Optional.of(product));
         when(palletRepository.findById(1)).thenReturn(Optional.of(pallet));
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
 
@@ -241,7 +242,7 @@ public class OrderServiceTest {
         client.setCompanyName("Fresh Fruits Inc");
 
         Product product = new Product();
-        product.setProductId("M_EA_B_M");
+        product.setProductCode("M_EA_B_M");
         product.setTotalWeight(1000.0);
 
         Order order = new Order();
@@ -264,7 +265,7 @@ public class OrderServiceTest {
         pallet.setPreparationTime(5.0);
 
         when(clientRepository.findByCompanyName("Fresh Fruits Inc")).thenReturn(client);
-        when(productRepository.findById("M_EA_B_M")).thenReturn(Optional.of(product));
+        when(productRepository.findByProductCode("M_EA_B_M")).thenReturn(Optional.of(product));
         when(palletRepository.findById(1)).thenReturn(Optional.of(pallet));
         when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
 

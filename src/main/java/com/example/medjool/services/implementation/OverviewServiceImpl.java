@@ -7,6 +7,7 @@ import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ProductRepository;
 import com.example.medjool.repository.SystemSettingRepository;
 import com.example.medjool.services.OverviewService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class OverviewServiceImpl implements OverviewService {
     private final SystemSettingRepository systemSettingRepository;
     private final AlertServiceImpl alertService;
 
+    @Autowired
     public OverviewServiceImpl(ProductRepository productRepository, OrderRepository orderRepository, SystemSettingRepository systemSettingRepository, AlertServiceImpl alertService) {
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;

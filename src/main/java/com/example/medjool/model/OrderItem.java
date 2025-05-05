@@ -39,6 +39,9 @@ public class OrderItem {
     @Column(name = "item_weight", nullable = false)
     private double itemWeight;
 
+    @Column(name = "brand")
+    private String brand;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pallet_id", nullable = false)
     Pallet pallet;

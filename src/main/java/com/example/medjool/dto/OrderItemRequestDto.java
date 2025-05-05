@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OrderItemRequestDto {
 
-    private String productId;
+    private String productCode;
 
     private double pricePerKg;
 
@@ -20,6 +20,8 @@ public class OrderItemRequestDto {
     private int numberOfPallets;
 
     private double itemWeight;
+
+    private String itemBrand;
 
     private Integer palletId;
 

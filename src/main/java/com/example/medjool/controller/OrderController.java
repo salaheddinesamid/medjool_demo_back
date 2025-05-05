@@ -1,10 +1,8 @@
 package com.example.medjool.controller;
 
-import com.example.medjool.dto.OrderRequestDto;
-import com.example.medjool.dto.OrderResponseDto;
+import com.example.medjool.dto.*;
 
-import com.example.medjool.dto.OrderStatusDto;
-import com.example.medjool.dto.OrderUpdateRequestDto;
+import com.example.medjool.model.OrderHistory;
 import com.example.medjool.services.implementation.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,6 +42,12 @@ public class OrderController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateOrder(@PathVariable Long id, @RequestBody OrderUpdateRequestDto orderRequestDto) throws Exception {
         return orderService.updateOrder(id,orderRequestDto);
+    }
+
+    @GetMapping("history/get_all")
+
+    public ResponseEntity<List<OrderHistoryResponseDto>> getAllHistory(){
+        return orderService.getAllOrderHistory();
     }
 
     @DeleteMapping("/cancel/{id}")

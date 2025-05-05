@@ -42,7 +42,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         Client client = new Client();
         // Set Client details
         client.setCompanyName(clientDto.getCompanyName());
-
+        client.setPreferredProductQuality(clientDto.getPreferredProductQuality());
         client.setCompanyActivity(clientDto.getCompanyActivity());
         client.setGeneralManager(clientDto.getGeneralManager());
         client.setClientStatus(ClientStatus.valueOf(clientDto.getStatus()));

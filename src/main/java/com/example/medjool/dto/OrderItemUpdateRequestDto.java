@@ -7,7 +7,7 @@ public class OrderItemUpdateRequestDto {
 
     private long itemId;
 
-    private String productId;
+    private String productCode;
     private double newQuantity;
     private double newPrice;
     private double newPackaging;
