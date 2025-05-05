@@ -34,6 +34,9 @@ public class Client {
     @Column(name = "web_site")
     private String webSite;
 
+    @Column(name = "preferred_product_quality")
+    private String preferredProductQuality;
+
     @OneToMany
     List<Address> addresses;
 
