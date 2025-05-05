@@ -10,11 +10,8 @@ import com.example.medjool.exception.ProductNotFoundException;
 
 
 import com.example.medjool.model.*;
-import com.example.medjool.repository.ClientRepository;
+import com.example.medjool.repository.*;
 
-import com.example.medjool.repository.OrderRepository;
-import com.example.medjool.repository.PalletRepository;
-import com.example.medjool.repository.ProductRepository;
 import com.example.medjool.services.implementation.OrderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +43,9 @@ public class OrderServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private OrderItemRepository orderItemRepository;
 
     @InjectMocks
     private OrderServiceImpl orderService;

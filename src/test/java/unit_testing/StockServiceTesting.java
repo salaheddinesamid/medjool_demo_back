@@ -1,9 +1,11 @@
 package unit_testing;
-/**
+
 import com.example.medjool.dto.NewProductDto;
 import com.example.medjool.model.Product;
+
 import com.example.medjool.repository.ProductRepository;
 import com.example.medjool.services.implementation.StockServiceImpl;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -77,20 +79,22 @@ class StockServiceTesting {
         void testUpdateStock_Success() throws Exception {
 
             // Create e CSV content:
-            String csvContent = "product_id,quantity\n123,50\n456,30";
+            String csvContent = "product_code,total_weight\n123,50\n456,30";
             MockMultipartFile file = new MockMultipartFile("file", "stock.csv", "text/csv", csvContent.getBytes());
 
 
             Product product1 = new Product();
-            product1.setProductId("123");
+            product1.setProductId(1L);
+            product1.setProductCode("S00_EA0_D_MS");
             product1.setTotalWeight(100.0);
 
             Product product2 = new Product();
-            product2.setProductId("456");
+            product1.setProductCode("S00_ML0_D_MS");
+            product2.setProductId(3L);
             product2.setTotalWeight(200.0);
 
-            when(productRepository.findById("123")).thenReturn(Optional.of(product1));
-            when(productRepository.findById("456")).thenReturn(Optional.of(product2));
+            when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
+            when(productRepository.findById(3L)).thenReturn(Optional.of(product2));
 
 
             ResponseEntity<Object> response = stockService.updateStock(file);
@@ -110,7 +114,7 @@ class StockServiceTesting {
             MockMultipartFile file = new MockMultipartFile("file", "stock.csv", "text/csv", csvContent.getBytes());
 
             // Mock pour un produit non trouvé
-            when(productRepository.findById("789")).thenReturn(Optional.empty());
+            when(productRepository.findByProductCode("789")).thenReturn(Optional.empty());
 
             // Appel de la méthode à tester
             ResponseEntity<Object> response = stockService.updateStock(file);
@@ -120,4 +124,4 @@ class StockServiceTesting {
             assertEquals("Stock updated successfully", response.getBody());
             verify(productRepository, never()).save(any(Product.class));
         }
-    }**/
+    }
