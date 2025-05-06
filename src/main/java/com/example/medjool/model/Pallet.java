@@ -30,6 +30,14 @@ public class Pallet {
     @Column(name = "number_of_stories_in_pallet")
     private Integer numberOfStoriesInPallet;
 
+    @Column(name = "number_of_boxes_in_story")
+    private Integer numberOfBoxesInStory;
+
+
+    @Column(name = "number_of_boxes_in_pallet")
+    private Integer numberOfBoxesInPallet;
+
+
     @Column(name = "height")
     private float height;
 

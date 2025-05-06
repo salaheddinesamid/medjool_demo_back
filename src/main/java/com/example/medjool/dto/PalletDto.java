@@ -13,6 +13,8 @@ public class PalletDto {
     Integer numberOfBoxesInCarton;
     Integer numberOfCartonsInStory;
     Integer numberOfStoriesInPallet;
+    Integer numberOfBoxesInStory;
+    Integer numberOfBoxesInPallet;
 
     float height;
     float width;
