@@ -188,10 +188,25 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             return new ResponseEntity<>("Pallet already exists", HttpStatus.CONFLICT);
         }
         Pallet newPallet = new Pallet();
-        newPallet.setNumberOfStoriesInPallet(palletDto.getNumberOfStoriesInPallet());
-        newPallet.setNumberOfBoxesInCarton(palletDto.getNumberOfBoxesInCarton());
 
-        newPallet.setNumberOfCartonsInStory(palletDto.getNumberOfCartonsInStory());
+        int totalBoxes = 0;
+
+        if(palletDto.getPackaging() == 5){
+            newPallet.setPackaging(5);
+            newPallet.setNumberOfBoxesInStory(palletDto.getNumberOfBoxesInStory());
+            newPallet.setNumberOfStoriesInPallet(palletDto.getNumberOfStoriesInPallet());
+            totalBoxes = newPallet.getNumberOfBoxesInStory() * newPallet.getNumberOfStoriesInPallet();
+            newPallet.setNumberOfBoxesInPallet(totalBoxes);
+        }else{
+            newPallet.setPackaging(palletDto.getPackaging());
+            newPallet.setNumberOfBoxesInCarton(palletDto.getNumberOfBoxesInCarton());
+            newPallet.setNumberOfCartonsInStory(palletDto.getNumberOfCartonsInStory());
+            newPallet.setNumberOfStoriesInPallet(palletDto.getNumberOfStoriesInPallet());
+
+            totalBoxes = newPallet.getNumberOfBoxesInCarton() * newPallet.getNumberOfCartonsInStory() * newPallet.getNumberOfStoriesInPallet();
+            newPallet.setNumberOfBoxesInPallet(totalBoxes);
+        }
+
         // Dimensions:
 
         newPallet.setHeight(palletDto.getHeight());
