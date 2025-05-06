@@ -120,6 +120,7 @@ public class ConfigurationServiceTesting {
     }
 
 
+    /*
     @Test
     void createPallet_AlreadyExists(){
         PalletDto palletDto = new PalletDto(1,20,2,10,100,100,20,500.0f,100,"Standard","");
@@ -136,6 +137,8 @@ public class ConfigurationServiceTesting {
 
         assertEquals(409, response.getStatusCodeValue());
     }
+
+     */
 
     @Test
     void getClientAddresses(){

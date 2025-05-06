@@ -22,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,13 +57,7 @@ public class StockServiceImpl implements StockService {
             for (CSVRecord record : csvParser) {
                 System.out.println("Reading the row");
                 String productCode = record.get("product_code");
-                String rawWeight = record.get("total_weight");
-                System.out.println("Raw weight: " + rawWeight);
-
-                String cleanedWeight = rawWeight.trim().replace(".", "").replace(",", ".");
-                System.out.println("Cleaned weight: " + cleanedWeight);
-
-                double totalWeight = Double.parseDouble(cleanedWeight);
+                Double totalWeight = Double.parseDouble(record.get("total_weight"));
                 Product product = productRepository.findByProductCode(productCode).orElseThrow(() -> new ProductNotFoundException());
 
                 if (product != null) {
