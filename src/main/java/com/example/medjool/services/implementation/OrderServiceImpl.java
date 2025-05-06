@@ -47,10 +47,8 @@ public class OrderServiceImpl implements OrderService{
                 .orElseThrow(ClientNotActiveException::new);
 
         Order order = new Order();
-        orderRepository.save(order);
-
-
-        List<OrderItem> orderItems = new ArrayList<>();
+        order.setClient(client);
+        order.setOrderItems(new ArrayList<>()); // initialize to prevent null issues
 
         double totalPrice = 0.0;
         double totalWeight = 0.0;
@@ -64,7 +62,6 @@ public class OrderServiceImpl implements OrderService{
                 throw new ProductLowStock();
             }
 
-            // Deduct product weight
             product.setTotalWeight(product.getTotalWeight() - itemDto.getItemWeight());
 
             Pallet pallet = palletRepository.findById(itemDto.getPalletId())
@@ -78,22 +75,17 @@ public class OrderServiceImpl implements OrderService{
             orderItem.setNumberOfPallets(itemDto.getNumberOfPallets());
             orderItem.setOrderCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
             orderItem.setPallet(pallet);
-            orderItem.setOrder(order);
+            orderItem.setOrder(order); // maintain bidirectional relationship
 
-            orderItems.add(orderItem);
+            order.getOrderItems().add(orderItem); // maintain bidirectional relationship
 
             totalPrice += itemDto.getPricePerKg() * itemDto.getItemWeight();
             totalWeight += itemDto.getItemWeight();
-            estimatedDeliveryTime += pallet.getPreparationTime();
+            estimatedDeliveryTime += (long) pallet.getPreparationTime();
         }
 
-        // Save updated products and order items
-        productRepository.saveAll(orderItems.stream().map(OrderItem::getProduct).collect(Collectors.toList()));
-        orderItemRepository.saveAll(orderItems);
+        productRepository.saveAll(order.getOrderItems().stream().map(OrderItem::getProduct).collect(Collectors.toList()));
 
-        // Set order fields
-        order.setClient(client);
-        order.setOrderItems(orderItems);
         order.setTotalPrice(totalPrice);
         order.setTotalWeight(totalWeight);
         order.setProductionDate(LocalDateTime.now());
@@ -102,7 +94,10 @@ public class OrderServiceImpl implements OrderService{
         order.setShippingAddress(orderRequest.getShippingAddress());
         order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
 
+        orderRepository.save(order); // Save after everything is set
+
         return ResponseEntity.ok("Order has been created successfully.");
+
     }
 
 
