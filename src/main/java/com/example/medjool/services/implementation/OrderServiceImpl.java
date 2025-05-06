@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -40,52 +41,68 @@ public class OrderServiceImpl implements OrderService{
     public ResponseEntity<?> createOrder(OrderRequestDto orderRequest) {
         logger.info("New Order is being processed...");
 
+        // Validate client
         Client client = Optional.ofNullable(clientRepository.findByCompanyName(orderRequest.getClientName()))
-                .filter(c -> c.getClientStatus().toString().equals("ACTIVE"))
+                .filter(c -> c.getClientStatus() == ClientStatus.ACTIVE)
                 .orElseThrow(ClientNotActiveException::new);
 
         Order order = new Order();
-        order.setClient(client);
+        orderRepository.save(order);
 
-        List<OrderItem> orderItems = orderRequest.getItems().stream().map(item -> {
-            Product product = productRepository.findByProductCode(item.getProductCode())
+
+        List<OrderItem> orderItems = new ArrayList<>();
+
+        double totalPrice = 0.0;
+        double totalWeight = 0.0;
+        long estimatedDeliveryTime = 0;
+
+        for (OrderItemRequestDto itemDto : orderRequest.getItems()) {
+            Product product = productRepository.findByProductCode(itemDto.getProductCode())
                     .orElseThrow(ProductNotFoundException::new);
 
-            if (product.getTotalWeight() < item.getItemWeight()) {
+            if (product.getTotalWeight() < itemDto.getItemWeight()) {
                 throw new ProductLowStock();
             }
 
-            Pallet pallet = palletRepository.findById(item.getPalletId())
+            // Deduct product weight
+            product.setTotalWeight(product.getTotalWeight() - itemDto.getItemWeight());
+
+            Pallet pallet = palletRepository.findById(itemDto.getPalletId())
                     .orElseThrow(() -> new RuntimeException("Pallet not found"));
+
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
-            orderItem.setItemWeight(item.getItemWeight());
-            orderItem.setPricePerKg(item.getPricePerKg());
-            orderItem.setPackaging(item.getPackaging());
-            orderItem.setNumberOfPallets(item.getNumberOfPallets());
+            orderItem.setItemWeight(itemDto.getItemWeight());
+            orderItem.setPricePerKg(itemDto.getPricePerKg());
+            orderItem.setPackaging(itemDto.getPackaging());
+            orderItem.setNumberOfPallets(itemDto.getNumberOfPallets());
+            orderItem.setOrderCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
             orderItem.setPallet(pallet);
-            return orderItem;
-        }).toList();
+            orderItem.setOrder(order);
 
+            orderItems.add(orderItem);
 
+            totalPrice += itemDto.getPricePerKg() * itemDto.getItemWeight();
+            totalWeight += itemDto.getItemWeight();
+            estimatedDeliveryTime += pallet.getPreparationTime();
+        }
+
+        // Save updated products and order items
         productRepository.saveAll(orderItems.stream().map(OrderItem::getProduct).collect(Collectors.toList()));
+        orderItemRepository.saveAll(orderItems);
 
-        double totalPrice = orderItems.stream().map(orderItem -> orderItem.getPricePerKg() * orderItem.getItemWeight()).reduce(0.0, Double::sum);
-        double totalWeight = orderItems.stream().map(OrderItem::getItemWeight).reduce(0.0, Double::sum);
-        long estimatedDeliveryTime = orderItems.stream().map(item -> item.getPallet().getPreparationTime()).reduce(0.0, Double::sum).longValue();
+        // Set order fields
+        order.setClient(client);
+        order.setOrderItems(orderItems);
         order.setTotalPrice(totalPrice);
         order.setTotalWeight(totalWeight);
-
-        order.setOrderItems(orderItems);
         order.setProductionDate(LocalDateTime.now());
         order.setStatus(OrderStatus.PRELIMINARY);
         order.setCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
-        order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
         order.setShippingAddress(orderRequest.getShippingAddress());
+        order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
 
-        Order savedOrder = orderRepository.save(order);
-
-        return new ResponseEntity<>("Order has been created successfully.", HttpStatus.OK);
+        return ResponseEntity.ok("Order has been created successfully.");
     }
 
 
