@@ -299,6 +299,7 @@ public class OrderServiceImpl implements OrderService{
         List<OrderHistoryResponseDto> response = orderHistories.stream()
                 .map(orderHistory ->{
                     OrderHistoryResponseDto orderHistoryResponseDto = new OrderHistoryResponseDto();
+                    orderHistoryResponseDto.setHistoryId(orderHistory.getId());
                     orderHistoryResponseDto.setOrderNumber(orderHistory.getOrder().getId());
                     orderHistoryResponseDto.setClientName(orderHistory.getOrder().getClient().getCompanyName());
                     orderHistoryResponseDto.setConfirmedAt(orderHistory.getConfirmedAt());
