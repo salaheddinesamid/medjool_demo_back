@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class OrderHistory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @OneToOne

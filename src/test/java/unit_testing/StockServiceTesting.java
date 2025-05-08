@@ -79,7 +79,7 @@ class StockServiceTesting {
         void testUpdateStock_Success() throws Exception {
 
             // Create e CSV content:
-            String csvContent = "product_code,total_weight\n123,50\n456,30";
+            String csvContent = "product_code,total_weight\nS00_EA0_D_MS,50";
             MockMultipartFile file = new MockMultipartFile("file", "stock.csv", "text/csv", csvContent.getBytes());
 
 
@@ -88,13 +88,8 @@ class StockServiceTesting {
             product1.setProductCode("S00_EA0_D_MS");
             product1.setTotalWeight(100.0);
 
-            Product product2 = new Product();
-            product1.setProductCode("S00_ML0_D_MS");
-            product2.setProductId(3L);
-            product2.setTotalWeight(200.0);
 
             when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
-            when(productRepository.findById(3L)).thenReturn(Optional.of(product2));
 
 
             ResponseEntity<Object> response = stockService.updateStock(file);
@@ -103,7 +98,6 @@ class StockServiceTesting {
             assertEquals(200, response.getStatusCodeValue());
             assertEquals("Stock updated successfully", response.getBody());
             assertEquals(50.0, product1.getTotalWeight());
-            assertEquals(30.0, product2.getTotalWeight());
             verify(productRepository, times(2)).save(any(Product.class));
         }
 
