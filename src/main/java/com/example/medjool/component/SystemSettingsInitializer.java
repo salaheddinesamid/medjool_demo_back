@@ -26,5 +26,11 @@ public class SystemSettingsInitializer {
             minStockLevel.setValue(10.0);
             systemSettingRepository.save(minStockLevel);
         }
+        if(systemSettingRepository.findByKey("factory_working_hours").isEmpty()){
+            SystemSetting factoryWorkingHours = new SystemSetting();
+            factoryWorkingHours.setKey("factory_working_hours");
+            factoryWorkingHours.setValue(16.0);
+            systemSettingRepository.save(factoryWorkingHours);
+        }
     }
 }
