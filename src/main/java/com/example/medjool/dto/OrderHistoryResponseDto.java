@@ -16,6 +16,7 @@ public class OrderHistoryResponseDto {
     private LocalDateTime readyToShipAt;
     private LocalDateTime shippedAt;
     private LocalDateTime deliveredAt;
+    private LocalDateTime receivedAt;
 
 
 }

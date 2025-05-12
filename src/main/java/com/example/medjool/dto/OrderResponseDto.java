@@ -3,14 +3,11 @@ package com.example.medjool.dto;
 import com.example.medjool.model.Order;
 import lombok.Getter;
 import lombok.Setter;
-
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Setter
-
 public class OrderResponseDto {
     private Long id;
     private String clientName;

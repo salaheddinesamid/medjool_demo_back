@@ -1,5 +1,6 @@
 package com.example.medjool.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,11 +23,10 @@ public class OrderHistory {
     @Column(name = "confirmed_at")
     private LocalDateTime confirmedAt;
 
-    @Column(name = "sent_to_production_at")
-    private LocalDateTime sentToProductionAt;
 
-    @Column(name = "in_production_at")
-    private LocalDateTime inProductionAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS")
+    @Column(name = "preferred_production_date")
+    private LocalDateTime preferredProductionDate;
 
     @Column(name = "ready_to_ship_at")
     private LocalDateTime readyToShipAt;
@@ -36,5 +36,8 @@ public class OrderHistory {
 
     @Column(name = "delivered_at")
     private LocalDateTime deliveredAt;
+
+    @Column(name = "received_at")
+    private LocalDateTime receivedAt;
 
 }
