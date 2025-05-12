@@ -94,12 +94,15 @@ public class OrderServiceImpl implements OrderService{
         order.setShippingAddress(orderRequest.getShippingAddress());
         order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
 
-        orderRepository.save(order); // Save after everything is set
+
+        Order savedOrder = orderRepository.save(order); // Save after everything is set
+        OrderHistory orderHistory = new OrderHistory();
+        orderHistory.setOrder(savedOrder);
+        orderHistoryRepository.save(orderHistory);
 
         return ResponseEntity.ok("Order has been created successfully.");
 
     }
-
 
 
     @Transactional(readOnly = true)
@@ -172,41 +175,61 @@ public class OrderServiceImpl implements OrderService{
     }
 
 
-    @CacheEvict(value = "order", key = "#id")
     @Transactional
     @Override
     public ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto) throws Exception {
         Order order = orderRepository.findById(id).orElse(null);
         if (order == null) {
             return ResponseEntity.notFound().build();
-
         }
 
-        OrderHistoryDto orderHistoryDto = new OrderHistoryDto();
-        orderHistoryDto.setOrderId(id);
-        orderHistoryDto.setNewStatus(orderStatusDto.getNewStatus());
+        OrderHistory orderHistory = orderHistoryRepository.findByOrderId(order.getId());
 
-        if(order.getStatus() == OrderStatus.IN_PRODUCTION && orderStatusDto.getNewStatus().equals("CANCELED") ||
-        order.getStatus() == OrderStatus.READY_TO_SHIPPED && orderStatusDto.getNewStatus().equals("CANCELED") ||
-        order.getStatus() == OrderStatus.SHIPPED && orderStatusDto.getNewStatus().equals("CANCELED")){
+        OrderStatus newStatus;
+        try {
+            newStatus = OrderStatus.valueOf(orderStatusDto.getNewStatus());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid status: " + orderStatusDto.getNewStatus());
+        }
+
+        OrderStatus currentStatus = order.getStatus();
+
+        // Prevent illegal cancellations
+        if (List.of(OrderStatus.IN_PRODUCTION, OrderStatus.READY_TO_SHIPPED, OrderStatus.SHIPPED).contains(currentStatus)
+                && newStatus == OrderStatus.CANCELED) {
             throw new OrderCannotBeCanceledException("Order cannot be canceled at this stage.");
         }
 
-        if(orderStatusDto.getNewStatus().equals("CANCELED")){
-            for (OrderItem orderItem : order.getOrderItems()){
-                Product product = orderItem.getProduct();
-                product.setTotalWeight(product.getTotalWeight() + orderItem.getItemWeight());
+
+        // Status-specific logic
+        switch (newStatus) {
+            case CONFIRMED -> {
+                order.setStatus(OrderStatus.CONFIRMED);
+                orderHistory.setConfirmedAt(LocalDateTime.now());
+                orderHistory.setPreferredProductionDate(orderStatusDto.getPreferredProductionDate());
             }
+
+            case CANCELED -> {
+                for (OrderItem orderItem : order.getOrderItems()) {
+                    Product product = orderItem.getProduct();
+                    product.setTotalWeight(product.getTotalWeight() + orderItem.getItemWeight());
+                }
+            }
+
+            case SHIPPED -> {
+                shipmentService.createShipment(Optional.of(order));
+            }
+
+            case IN_PRODUCTION, READY_TO_SHIPPED, RECEIVED -> {
+                // No special business logic needed here (yet), just proceed
+            }
+
+            default -> throw new IllegalArgumentException("Unhandled status: " + newStatus);
         }
 
-        else if (orderStatusDto.getNewStatus().equals("SHIPPED")){
-            shipmentService.createShipment(Optional.of(order));
-        }
-
-
-        order.setStatus(OrderStatus.valueOf(orderStatusDto.getNewStatus()));
+        // Final status update
+        order.setStatus(newStatus);
         orderRepository.save(order);
-        addOrderHistory(orderHistoryDto);
         return ResponseEntity.ok().build();
     }
 
@@ -241,8 +264,11 @@ public class OrderServiceImpl implements OrderService{
         return new ResponseEntity<>("Order has been cancelled.", HttpStatus.OK);
     }
 
+
+
     @Override
     public void addOrderHistory(OrderHistoryDto orderHistoryDto) {
+        /*
         Order order = orderRepository.findById(orderHistoryDto.getOrderId()).orElse(null);
         if (order == null) {
             throw new IllegalArgumentException("Order not found for ID: " + orderHistoryDto.getOrderId());
@@ -258,16 +284,13 @@ public class OrderServiceImpl implements OrderService{
             case "CONFIRMED" -> {
                 if (orderHistory.getConfirmedAt() == null) {
                     orderHistory.setConfirmedAt(LocalDateTime.now());
+                    orderHistory.setPreferredProductionDate(orderHistoryDto.getPreferredProductionDate());
                 }
             }
-            case "SENT_TO_PRODUCTION" -> {
-                if (orderHistory.getSentToProductionAt() == null) {
-                    orderHistory.setSentToProductionAt(LocalDateTime.now());
-                }
-            }
+
             case "IN_PRODUCTION" -> {
-                if (orderHistory.getInProductionAt() == null) {
-                    orderHistory.setInProductionAt(LocalDateTime.now());
+                if (orderHistory.getPreferredProductionDate() == null) {
+                    orderHistory.setPreferredProductionDate(LocalDateTime.now());
                 }
             }
             case "READY_TO_SHIPPED" -> {
@@ -290,25 +313,27 @@ public class OrderServiceImpl implements OrderService{
 
         orderHistoryRepository.save(orderHistory);
         logger.info("Order history has been updated successfully.");
+
+         */
     }
 
     @Override
     public ResponseEntity<List<OrderHistoryResponseDto>> getAllOrderHistory() {
 
-        List<OrderHistory> orderHistories = orderHistoryRepository.findAll();
 
-        List<OrderHistoryResponseDto> response = orderHistories.stream()
+        List<OrderHistoryResponseDto> response =  orderHistoryRepository.findAll()
+                        .stream().filter(orderHistory -> orderHistory.getReceivedAt() == null)
                 .map(orderHistory ->{
                     OrderHistoryResponseDto orderHistoryResponseDto = new OrderHistoryResponseDto();
                     orderHistoryResponseDto.setHistoryId(orderHistory.getId());
                     orderHistoryResponseDto.setOrderNumber(orderHistory.getOrder().getId());
                     orderHistoryResponseDto.setClientName(orderHistory.getOrder().getClient().getCompanyName());
                     orderHistoryResponseDto.setConfirmedAt(orderHistory.getConfirmedAt());
-                    orderHistoryResponseDto.setSentToProductionAt(orderHistory.getSentToProductionAt());
-                    orderHistoryResponseDto.setInProductionAt(orderHistory.getInProductionAt());
+                    orderHistoryResponseDto.setInProductionAt(orderHistory.getPreferredProductionDate());
                     orderHistoryResponseDto.setReadyToShipAt(orderHistory.getReadyToShipAt());
                     orderHistoryResponseDto.setShippedAt(orderHistory.getShippedAt());
                     orderHistoryResponseDto.setDeliveredAt(orderHistory.getDeliveredAt());
+                    orderHistoryResponseDto.setReceivedAt(orderHistory.getReceivedAt());
                     return orderHistoryResponseDto;
                 })
                 .toList();
