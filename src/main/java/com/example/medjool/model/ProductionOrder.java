@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@Table(name = "production_orders")
 public class ProductionOrder {
 
     @Id
@@ -17,13 +18,19 @@ public class ProductionOrder {
     private Long id;
 
     @OneToOne
-    @Column(name = "order_id")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @Column(name = "start_date")
     private LocalDateTime startDate;
 
+    @Enumerated(EnumType.STRING)
+    private ProductionStatus productionStatus;
+
     @Column(name = "working_hours")
-    private Integer workingHours;
+    private double workingHours;
+
+    @Column(name = "remaining_hours")
+    private double remainingHours;
 
 }
