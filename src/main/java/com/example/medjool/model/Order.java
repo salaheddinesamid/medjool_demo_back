@@ -49,6 +49,9 @@ public class Order {
     @Column(length = 30) // optional, to avoid truncation for long enum names
     private OrderStatus status;
 
+    @Column(name = "working_hours",nullable = true)
+    private double workingHours;
+
     public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
         orderItem.setOrder(this);
