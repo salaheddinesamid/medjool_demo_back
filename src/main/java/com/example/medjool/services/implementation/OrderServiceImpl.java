@@ -33,6 +33,7 @@ public class OrderServiceImpl implements OrderService{
     private final PalletRepository palletRepository;
     private final ShipmentServiceImpl shipmentService;
     private final OrderItemRepository orderItemRepository;
+    private final ProductionServiceImpl productionService;
 
     Logger logger = Logger.getLogger(OrderService.class.getName());
 
@@ -53,6 +54,7 @@ public class OrderServiceImpl implements OrderService{
         double totalPrice = 0.0;
         double totalWeight = 0.0;
         long estimatedDeliveryTime = 0;
+        double totalWorkingHours = 0;
 
         for (OrderItemRequestDto itemDto : orderRequest.getItems()) {
             Product product = productRepository.findByProductCode(itemDto.getProductCode())
@@ -82,6 +84,7 @@ public class OrderServiceImpl implements OrderService{
             totalPrice += itemDto.getPricePerKg() * itemDto.getItemWeight();
             totalWeight += itemDto.getItemWeight();
             estimatedDeliveryTime += (long) pallet.getPreparationTime();
+            totalWorkingHours += pallet.getPreparationTime();
         }
 
         productRepository.saveAll(order.getOrderItems().stream().map(OrderItem::getProduct).collect(Collectors.toList()));
@@ -93,6 +96,7 @@ public class OrderServiceImpl implements OrderService{
         order.setCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
         order.setShippingAddress(orderRequest.getShippingAddress());
         order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
+        order.setWorkingHours(totalWorkingHours);
 
 
         Order savedOrder = orderRepository.save(order); // Save after everything is set
@@ -207,6 +211,7 @@ public class OrderServiceImpl implements OrderService{
                 order.setStatus(OrderStatus.CONFIRMED);
                 orderHistory.setConfirmedAt(LocalDateTime.now());
                 orderHistory.setPreferredProductionDate(orderStatusDto.getPreferredProductionDate());
+                productionService.pushIntoProduction(order.getId(), orderStatusDto.getPreferredProductionDate());
             }
 
             case CANCELED -> {

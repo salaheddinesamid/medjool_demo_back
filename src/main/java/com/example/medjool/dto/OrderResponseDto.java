@@ -19,7 +19,7 @@ public class OrderResponseDto {
     private List<OrderItemResponseDto> items;
     private LocalDateTime productionDate;
     private LocalDateTime deliveryDate;
-
+    private double workingHours;
     private String shippingAddress;
 
     public OrderResponseDto(Order order) {
@@ -34,6 +34,7 @@ public class OrderResponseDto {
                 .toList();
         this.productionDate = order.getProductionDate();
         this.deliveryDate = order.getDeliveryDate();
+        this.workingHours = order.getWorkingHours();
         this.shippingAddress  = order.getShippingAddress();
     }
 }

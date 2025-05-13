@@ -43,6 +43,7 @@ public class SecurityConfiguration {
                                         "/api/configuration/**",
                                         "/api/settings/**",
                                         "/api/alert/**",
+                                                "/api/production/**",
                                         "/api/user/**",
                                         "/api/notification/**",
                                         "/api/shipment/**",
