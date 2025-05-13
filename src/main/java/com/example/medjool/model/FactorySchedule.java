@@ -20,10 +20,10 @@ public class FactorySchedule {
     private LocalDateTime dateTime;
 
     @Column(name = "working_hours")
-    private Integer workingHours;
+    private double workingHours;
 
     @Column(name = "remaining_hours")
-    private Integer remainingHours;
+    private double remainingHours;
 
     @Column(name = "is_available")
     private Boolean isAvailable;
