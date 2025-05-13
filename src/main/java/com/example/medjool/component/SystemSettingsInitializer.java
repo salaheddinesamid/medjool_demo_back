@@ -17,7 +17,6 @@ public class SystemSettingsInitializer {
         this.systemSettingRepository = systemSettingRepository;
     }
 
-
     @EventListener(ApplicationReadyEvent.class)
     public void initialize() {
         if(systemSettingRepository.findByKey("min_stock_level").isEmpty()){
