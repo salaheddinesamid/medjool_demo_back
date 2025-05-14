@@ -1,6 +1,8 @@
 package com.example.medjool.services.implementation;
 
+import com.example.medjool.dto.FactoryScheduleResponseDto;
 import com.example.medjool.dto.ProductionDetailsResponseDto;
+import com.example.medjool.model.FactorySchedule;
 import com.example.medjool.model.Order;
 import com.example.medjool.model.ProductionOrder;
 import com.example.medjool.model.ProductionStatus;
@@ -9,6 +11,7 @@ import com.example.medjool.repository.OrderRepository;
 import com.example.medjool.repository.ProductionOrderRepository;
 import com.example.medjool.services.ProductionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -54,5 +57,22 @@ public class ProductionServiceImpl implements ProductionService {
         List<ProductionOrder> productionOrders = productionOrderRepository.findAll();
         return ResponseEntity.ok(productionOrders.stream()
                 .map(ProductionDetailsResponseDto::new).toList());
+    }
+
+    @Override
+    public ResponseEntity<List<FactoryScheduleResponseDto>> getFactorySchedule() {
+        List<FactorySchedule> factorySchedules = factoryScheduleRepository.findAll();
+        List<FactoryScheduleResponseDto> response = factorySchedules.stream()
+                .map(factorySchedule-> {
+                    FactoryScheduleResponseDto dto = new FactoryScheduleResponseDto();
+                    dto.setDate(factorySchedule.getDate());
+                    dto.setRemainingHours(factorySchedule.getRemainingHours());
+
+                    dto.setWorkingHours(factorySchedule.getWorkingHours());
+                    dto.setScheduledOrders(factorySchedule.getOrders().stream().map(Order::getId).toList());
+                    dto.setAvailable(factorySchedule.getIsAvailable());
+                    return dto;
+                }).toList();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
