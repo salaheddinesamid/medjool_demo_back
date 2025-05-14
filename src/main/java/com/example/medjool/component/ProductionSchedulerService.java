@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,34 +52,24 @@ public class ProductionSchedulerService {
             for(ProductionOrder productionOrder : productionOrderNotStarted) {
                 Order order = productionOrder.getOrder();
                 productionOrder.setRemainingHours(productionOrder.getRemainingHours() - workingHoursRate);
+                factorySchedule.setRemainingHours(factorySchedule.getRemainingHours() - workingHoursRate);
                 scheduledOrders.add(order);
+
+                if(factorySchedule.getRemainingHours() <=0){
+                    factorySchedule.setRemainingHours(0);
+                    factorySchedule.setIsAvailable(false);
+                    break;
+                }
             }
         }
 
         // When there are no orders in progress and there are orders not started yet:
-
         else if(!productionOrderInProgress.isEmpty() && productionOrderNotStarted.isEmpty()){
             double workingHoursRate = factoryWorkingHours / productionOrderInProgress.size();
             for(ProductionOrder productionOrder : productionOrderInProgress) {
                 Order order = productionOrder.getOrder();
                 productionOrder.setRemainingHours(productionOrder.getRemainingHours() - workingHoursRate);
                 factorySchedule.setRemainingHours(factorySchedule.getRemainingHours() - workingHoursRate);
-                scheduledOrders.add(order);
-            }
-        }
-
-        // When there are orders in progress and orders not started yet:
-        else if(!productionOrderInProgress.isEmpty() && !productionOrderNotStarted.isEmpty()){
-            double workingHoursRate = factoryWorkingHours / (productionOrderInProgress.size() + productionOrderNotStarted.size());
-            for(ProductionOrder productionOrder : productionOrderInProgress) {
-                Order order = productionOrder.getOrder();
-                productionOrder.setRemainingHours(productionOrder.getRemainingHours() - workingHoursRate);
-                factorySchedule.setRemainingHours(factorySchedule.getRemainingHours() - workingHoursRate);
-                scheduledOrders.add(order);
-            }
-            for(ProductionOrder productionOrder : productionOrderNotStarted) {
-                Order order = productionOrder.getOrder();
-                productionOrder.setRemainingHours(productionOrder.getRemainingHours() - workingHoursRate);
                 scheduledOrders.add(order);
             }
         }
