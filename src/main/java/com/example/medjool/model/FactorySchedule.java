@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,8 +17,8 @@ public class FactorySchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scheduleId;
 
-    @Column(name = "date_time")
-    private LocalDateTime dateTime;
+    @Column(name = "date")
+    private LocalDate date;
 
     @Column(name = "working_hours")
     private double workingHours;

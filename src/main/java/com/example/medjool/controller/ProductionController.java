@@ -1,5 +1,6 @@
 package com.example.medjool.controller;
 
+import com.example.medjool.dto.FactoryScheduleResponseDto;
 import com.example.medjool.dto.ProductionDetailsResponseDto;
 import com.example.medjool.services.implementation.ProductionServiceImpl;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +25,10 @@ public class ProductionController {
     @GetMapping("/get_all")
     public ResponseEntity<List<ProductionDetailsResponseDto>> getAll() throws Exception {
         return productionService.getAllProductionDetails();
+    }
+
+    @GetMapping("factory/get_daily_schedule")
+    public ResponseEntity<List<FactoryScheduleResponseDto>> getFactorySchedule() throws Exception {
+        return productionService.getFactorySchedule();
     }
 }
