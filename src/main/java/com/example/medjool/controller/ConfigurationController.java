@@ -78,6 +78,10 @@ public class ConfigurationController {
         return configurationService.deletePallet(palletId);
     }
 
+    @PutMapping("pallet/update/{palletId}")
+    public ResponseEntity<Object> updatePallet(@PathVariable Integer palletId, @RequestBody UpdatePalletDto palletDto) {
+        return configurationService.updatePallet(palletId, palletDto);
+    }
 
 
 

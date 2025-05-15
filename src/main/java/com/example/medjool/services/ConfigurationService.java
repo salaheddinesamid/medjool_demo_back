@@ -1,9 +1,6 @@
 package com.example.medjool.services;
 
-import com.example.medjool.dto.AddressResponseDto;
-import com.example.medjool.dto.ClientDto;
-import com.example.medjool.dto.PalletDto;
-import com.example.medjool.dto.UpdateClientDto;
+import com.example.medjool.dto.*;
 import com.example.medjool.model.Client;
 import com.example.medjool.model.Pallet;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +24,8 @@ public interface ConfigurationService {
     ResponseEntity<Object> addPallet(PalletDto palletDto);
 
     ResponseEntity<List<Pallet>> getAllPallets();
+
+    ResponseEntity<Object> updatePallet(Integer id, UpdatePalletDto palletDto);
 
     ResponseEntity<Object> deletePallet(Integer id);
 

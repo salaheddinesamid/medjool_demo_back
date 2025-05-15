@@ -233,6 +233,31 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     }
 
     @Override
+    public ResponseEntity<Object> updatePallet(Integer id, UpdatePalletDto palletDto) {
+        Pallet pallet = palletRepository.findById(id).orElseThrow(()->
+                new RuntimeException("Pallet not found")
+        );
+
+        pallet.setHeight(palletDto.getHeight());
+        pallet.setWidth(palletDto.getWidth());
+        pallet.setLength(palletDto.getLength());
+        pallet.setPreparationTime(palletDto.getPreparationTime());
+        pallet.setTag(palletDto.getTag());
+        pallet.setTotalNet(palletDto.getTotalNet());
+        pallet.setPackaging(palletDto.getPackaging());
+
+        pallet.setNumberOfBoxesInCarton(palletDto.getNumberOfBoxesInCarton());
+        pallet.setNumberOfCartonsInStory(palletDto.getNumberOfCartonsInStory());
+        pallet.setNumberOfStoriesInPallet(palletDto.getNumberOfStoriesInPallet());
+
+        pallet.setNumberOfBoxesInStory(palletDto.getNumberOfBoxesInStory());
+
+        pallet.setNumberOfBoxesInPallet(palletDto.getNumberOfBoxesInPallet());
+
+        return new ResponseEntity<>("Pallet updated successfully", HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<List<Pallet>> getAllPalletsByPackaging(float packaging) {
         List<Pallet> pallets = palletRepository.findAllByPackaging(
                 packaging
