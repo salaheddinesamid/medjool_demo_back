@@ -66,7 +66,7 @@ public class OverviewServiceImpl implements OverviewService {
 
        for(Order order : orders) {
            if(order.getStatus().equals(OrderStatus.PRELIMINARY) ||
-                   order.getStatus().equals(OrderStatus.CONFIRMED)|| order.getStatus().equals(OrderStatus.SENT_TO_PRODUCTION)){
+                   order.getStatus().equals(OrderStatus.CONFIRMED)|| order.getStatus().equals(OrderStatus.IN_PRODUCTION)){
                totalOrdersPreProduction += 1;
                if(order.getCurrency().equals(OrderCurrency.USD)) {
                      totalPreProductionRevenue += order.getTotalPrice() * 10.5;
@@ -76,8 +76,8 @@ public class OverviewServiceImpl implements OverviewService {
                      totalPreProductionRevenue += order.getTotalPrice();
                }
            }
-           else if (order.getStatus().equals(OrderStatus.READY_TO_SHIPPED) ||
-                   order.getStatus().equals(OrderStatus.IN_PRODUCTION) || order.getStatus().equals(OrderStatus.SHIPPED)) {
+           else if (order.getStatus().equals(OrderStatus.READY_TO_SHIPPED)
+                   || order.getStatus().equals(OrderStatus.SHIPPED)) {
                totalOrdersPostProduction += 1;
                if(order.getCurrency().equals(OrderCurrency.USD)) {
                      totalPostProductionRevenue += order.getTotalPrice() * 10.5;

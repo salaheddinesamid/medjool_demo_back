@@ -25,4 +25,6 @@ public class OrderItemRequestDto {
 
     private Integer palletId;
 
+    private String currency;
+
 }

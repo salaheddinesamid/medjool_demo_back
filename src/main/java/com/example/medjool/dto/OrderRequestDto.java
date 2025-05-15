@@ -18,4 +18,15 @@ public class OrderRequestDto {
     private String currency;
     private LocalDate productionDate;
     private  String shippingAddress;
+
+    @Override
+    public String toString(){
+        return "OrderRequestDto{" +
+                "clientName='" + clientName + '\'' +
+                ", items=" + items +
+                ", currency='" + currency + '\'' +
+                ", productionDate=" + productionDate +
+                ", shippingAddress='" + shippingAddress + '\'' +
+                '}';
+    }
 }

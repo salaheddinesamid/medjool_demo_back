@@ -8,7 +8,6 @@ import com.example.medjool.model.*;
 import com.example.medjool.repository.*;
 import com.example.medjool.services.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -41,6 +40,7 @@ public class OrderServiceImpl implements OrderService{
     @Transactional
     public ResponseEntity<?> createOrder(OrderRequestDto orderRequest) {
         logger.info("New Order is being processed...");
+        logger.info(orderRequest.toString());
 
         // Validate client
         Client client = Optional.ofNullable(clientRepository.findByCompanyName(orderRequest.getClientName()))
@@ -75,7 +75,8 @@ public class OrderServiceImpl implements OrderService{
             orderItem.setPricePerKg(itemDto.getPricePerKg());
             orderItem.setPackaging(itemDto.getPackaging());
             orderItem.setNumberOfPallets(itemDto.getNumberOfPallets());
-            orderItem.setOrderCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
+            orderItem.setOrderCurrency(OrderCurrency.valueOf(itemDto.getCurrency()));
+            order.setCurrency(OrderCurrency.valueOf(itemDto.getCurrency()));
             orderItem.setPallet(pallet);
             orderItem.setOrder(order); // maintain bidirectional relationship
 
@@ -93,7 +94,7 @@ public class OrderServiceImpl implements OrderService{
         order.setTotalWeight(totalWeight);
         order.setProductionDate(LocalDateTime.now());
         order.setStatus(OrderStatus.PRELIMINARY);
-        order.setCurrency(OrderCurrency.valueOf(orderRequest.getCurrency()));
+
         order.setShippingAddress(orderRequest.getShippingAddress());
         order.setDeliveryDate(LocalDateTime.now().plusHours(estimatedDeliveryTime));
         order.setWorkingHours(totalWorkingHours);
@@ -107,7 +108,6 @@ public class OrderServiceImpl implements OrderService{
         return ResponseEntity.ok("Order has been created successfully.");
 
     }
-
 
     @Transactional(readOnly = true)
     @Override
@@ -227,6 +227,15 @@ public class OrderServiceImpl implements OrderService{
 
             case IN_PRODUCTION, READY_TO_SHIPPED, RECEIVED -> {
                 // No special business logic needed here (yet), just proceed
+                if (newStatus == OrderStatus.IN_PRODUCTION) {
+                    orderHistory.setPreferredProductionDate(LocalDateTime.now());
+                } else if (newStatus == OrderStatus.READY_TO_SHIPPED) {
+                    orderHistory.setReadyToShipAt(LocalDateTime.now());
+                } else if (newStatus == OrderStatus.SHIPPED) {
+                    orderHistory.setShippedAt(LocalDateTime.now());
+                } else if (newStatus == OrderStatus.RECEIVED) {
+                    orderHistory.setReceivedAt(LocalDateTime.now());
+                }
             }
 
             default -> throw new IllegalArgumentException("Unhandled status: " + newStatus);
@@ -267,59 +276,6 @@ public class OrderServiceImpl implements OrderService{
         // No need to call orderRepository.save(order); for same reason
 
         return new ResponseEntity<>("Order has been cancelled.", HttpStatus.OK);
-    }
-
-
-
-    @Override
-    public void addOrderHistory(OrderHistoryDto orderHistoryDto) {
-        /*
-        Order order = orderRepository.findById(orderHistoryDto.getOrderId()).orElse(null);
-        if (order == null) {
-            throw new IllegalArgumentException("Order not found for ID: " + orderHistoryDto.getOrderId());
-        }
-
-        OrderHistory orderHistory = orderHistoryRepository.findByOrderId(orderHistoryDto.getOrderId());
-        if (orderHistory == null) {
-            orderHistory = new OrderHistory();
-            orderHistory.setOrder(order);
-        }
-
-        switch (orderHistoryDto.getNewStatus()) {
-            case "CONFIRMED" -> {
-                if (orderHistory.getConfirmedAt() == null) {
-                    orderHistory.setConfirmedAt(LocalDateTime.now());
-                    orderHistory.setPreferredProductionDate(orderHistoryDto.getPreferredProductionDate());
-                }
-            }
-
-            case "IN_PRODUCTION" -> {
-                if (orderHistory.getPreferredProductionDate() == null) {
-                    orderHistory.setPreferredProductionDate(LocalDateTime.now());
-                }
-            }
-            case "READY_TO_SHIPPED" -> {
-                if (orderHistory.getReadyToShipAt() == null) {
-                    orderHistory.setReadyToShipAt(LocalDateTime.now());
-                }
-            }
-            case "SHIPPED" -> {
-                if (orderHistory.getShippedAt() == null) {
-                    orderHistory.setShippedAt(LocalDateTime.now());
-                }
-            }
-            case "RECEIVED" -> {
-                if (orderHistory.getDeliveredAt() == null) {
-                    orderHistory.setDeliveredAt(LocalDateTime.now());
-                }
-            }
-            default -> throw new IllegalArgumentException("Invalid status: " + orderHistoryDto.getNewStatus());
-        }
-
-        orderHistoryRepository.save(orderHistory);
-        logger.info("Order history has been updated successfully.");
-
-         */
     }
 
     @Override

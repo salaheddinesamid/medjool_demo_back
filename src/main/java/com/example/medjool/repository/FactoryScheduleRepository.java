@@ -7,5 +7,5 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public interface FactoryScheduleRepository extends JpaRepository<FactorySchedule,Long> {
-    boolean existsByDate(LocalDate date);
+    FactorySchedule findByDate(LocalDate date);
 }

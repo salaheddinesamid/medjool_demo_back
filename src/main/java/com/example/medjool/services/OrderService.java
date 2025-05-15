@@ -1,6 +1,5 @@
 package com.example.medjool.services;
 import com.example.medjool.dto.*;
-import com.example.medjool.model.OrderHistory;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -14,7 +13,6 @@ public interface OrderService {
     ResponseEntity<Object> updateOrder(Long id, OrderUpdateRequestDto orderUpdateRequestDto);
     ResponseEntity<Object> updateOrderStatus(Long id, OrderStatusDto orderStatusDto) throws Exception;
     ResponseEntity<Object> cancelOrder(Long id);
-    void addOrderHistory(OrderHistoryDto orderHistoryDto);
     ResponseEntity<List<OrderHistoryResponseDto>> getAllOrderHistory();
 
 
