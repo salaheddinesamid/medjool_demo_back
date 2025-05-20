@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductionSchedulerService {
-
 
     private final OrderHistoryRepository orderHistoryRepository;
     private final OrderRepository orderRepository;
@@ -26,7 +26,11 @@ public class ProductionSchedulerService {
     private final Logger logger = LoggerFactory.getLogger(ProductionSchedulerService.class);
 
     @Autowired
-    public ProductionSchedulerService(OrderHistoryRepository orderHistoryRepository, OrderRepository orderRepository, ProductionOrderRepository productionOrderRepository, SystemSettingRepository systemSettingRepository, FactoryScheduleRepository factoryScheduleRepository) {
+    public ProductionSchedulerService(OrderHistoryRepository orderHistoryRepository,
+                                      OrderRepository orderRepository,
+                                      ProductionOrderRepository productionOrderRepository,
+                                      SystemSettingRepository systemSettingRepository,
+                                      FactoryScheduleRepository factoryScheduleRepository) {
         this.orderHistoryRepository = orderHistoryRepository;
         this.orderRepository = orderRepository;
         this.productionOrderRepository = productionOrderRepository;
@@ -35,93 +39,127 @@ public class ProductionSchedulerService {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // Runs every half a day
+    @Scheduled(cron = "0 0 0 * * ?") // Runs every midnight (more reliable than fixedRate)
     public void scheduleProductionOrders() {
-        List<ProductionOrder> productionOrderInProgress = productionOrderRepository.findAllByProductionStatus(ProductionStatus.IN_PROGRESS);
-        List<ProductionOrder> productionOrderNotStarted = productionOrderRepository.findAllByProductionStatus(ProductionStatus.NOT_STARTED);
-        double factoryWorkingHours = systemSettingRepository.findByKey("factory_working_hours").get().getValue();
+        try {
+            Optional<SystemSetting> factoryHoursSetting = systemSettingRepository.findByKey("factory_working_hours");
+            if (!factoryHoursSetting.isPresent()) {
+                logger.error("Factory working hours setting not found");
+                return;
+            }
 
-        FactorySchedule factorySchedule = factoryScheduleRepository.findByDate(LocalDate.now());
-        if (factorySchedule == null) {
-            factorySchedule = new FactorySchedule();
-            factorySchedule.setDate(LocalDate.now());
-            factorySchedule.setWorkingHours(factoryWorkingHours);
-            factorySchedule.setRemainingHours(factoryWorkingHours);
-            factorySchedule.setIsAvailable(true);
+            double factoryWorkingHours = factoryHoursSetting.get().getValue();
+            if (factoryWorkingHours <= 0) {
+                logger.error("Invalid factory working hours value: {}", factoryWorkingHours);
+                return;
+            }
+
+            FactorySchedule factorySchedule = factoryScheduleRepository.findByDate(LocalDate.now());
+            if (factorySchedule == null) {
+                factorySchedule = createNewFactorySchedule(factoryWorkingHours);
+            }
+
+            List<ProductionOrder> productionOrderInProgress = productionOrderRepository.findAllByProductionStatus(ProductionStatus.IN_PROGRESS);
+            List<ProductionOrder> productionOrderNotStarted = productionOrderRepository.findAllByProductionStatus(ProductionStatus.NOT_STARTED);
+
+            scheduleInProgressOrders(factorySchedule, productionOrderInProgress, factoryWorkingHours);
+
+            if (factorySchedule.getRemainingHours() > 0 && !productionOrderNotStarted.isEmpty()) {
+                scheduleNotStartedOrders(factorySchedule, productionOrderNotStarted);
+            }
+
             factoryScheduleRepository.save(factorySchedule);
+        } catch (Exception e) {
+            logger.error("Error in production scheduling: {}", e.getMessage(), e);
         }
-
-        scheduleInProgressOrders(factorySchedule, productionOrderInProgress);
-
-        if (factorySchedule.getRemainingHours() > 0) {
-            scheduleNotStartedOrders(factorySchedule, productionOrderNotStarted);
-        }
-
     }
+
+    private FactorySchedule createNewFactorySchedule(double factoryWorkingHours) {
+        // No need to delete all records - just create a new one for today
+        FactorySchedule factorySchedule = new FactorySchedule();
+        factorySchedule.setDate(LocalDate.now());
+        factorySchedule.setWorkingHours(factoryWorkingHours);
+        factorySchedule.setRemainingHours(factoryWorkingHours);
+        factorySchedule.setIsAvailable(true);
+        return factoryScheduleRepository.save(factorySchedule);
+    }
+
     @Transactional
-    @Scheduled(fixedRate = 24 * 60 * 60 * 1000) // Runs every half a day
-    public void checkCompletedOrders(){
-
+    public void checkCompletedOrders() {
+        List<ProductionOrder> productionOrders = productionOrderRepository.findAllByProductionStatus(ProductionStatus.COMPLETED);
+        // TODO: Implement actual completion logic
+        logger.info("Found {} completed orders", productionOrders.size());
     }
 
-    private void scheduleInProgressOrders(FactorySchedule schedule, List<ProductionOrder> orders){
-
-        List<Order> scheduledOrders = new ArrayList<>(); // Initialize the list of orders to be scheduled...
-        double factoryWorkingHours = systemSettingRepository.findByKey("factory_working_hours").get().getValue();
-        // Scan the orders in progress first:
-        if(!orders.isEmpty()) {
-            double workingHoursRate = factoryWorkingHours / orders.size();
-            for(ProductionOrder productionOrder : orders) {
-                Order order = productionOrder.getOrder();
-                productionOrder.setRemainingHours(Math.max(0,productionOrder.getRemainingHours() - workingHoursRate));
-                productionOrderRepository.save(productionOrder);
-                schedule.setRemainingHours(Math.max(0,productionOrder.getRemainingHours() - workingHoursRate));
-                scheduledOrders.add(order);
-
-            }
-            if(schedule.getRemainingHours() <=0){
-                schedule.setRemainingHours(0);
-                schedule.setIsAvailable(false);
-            }
+    private void scheduleInProgressOrders(FactorySchedule schedule, List<ProductionOrder> orders, double factoryWorkingHours) {
+        if (orders == null || orders.isEmpty()) {
+            return;
         }
-
-        schedule.setOrders(scheduledOrders);
-        factoryScheduleRepository.save(schedule);
-    }
-
-    private void scheduleNotStartedOrders(FactorySchedule schedule, List<ProductionOrder> orders){
 
         List<Order> scheduledOrders = new ArrayList<>();
-        if(!orders.isEmpty()) {
-            double workingHoursRate = schedule.getWorkingHours() / orders.size();
-            for(ProductionOrder productionOrder : orders) {
-                Order order = productionOrder.getOrder();
-                productionOrder.setProductionStatus(ProductionStatus.IN_PROGRESS);
-                if(productionOrder.getRemainingHours() > 0) {
-                    if(productionOrder.getRemainingHours() > workingHoursRate) {
-                        productionOrder.setRemainingHours(Math.min(productionOrder.getRemainingHours(), workingHoursRate));
-                    }
-                    else if(productionOrder.getRemainingHours() == workingHoursRate) {
-                        productionOrder.setRemainingHours(workingHoursRate);
-                    }
-                    else{
-                        productionOrder.setRemainingHours(productionOrder.getWorkingHours() - workingHoursRate);
-                    }
-                }
-                else{
-                    productionOrder.setRemainingHours(0);
-                    productionOrder.setProductionStatus(ProductionStatus.COMPLETED);
-                }
-                schedule.setRemainingHours(schedule.getRemainingHours() - workingHoursRate);
-                scheduledOrders.add(order);
-                if(schedule.getRemainingHours() <=0){
-                    schedule.setRemainingHours(0);
-                    schedule.setIsAvailable(false);
-                    break;
-                }
+        double workingHoursRate = factoryWorkingHours / orders.size();
+
+        for (ProductionOrder productionOrder : orders) {
+            Order order = productionOrder.getOrder();
+            double newRemainingHours = Math.max(0, productionOrder.getRemainingHours() - workingHoursRate);
+
+            productionOrder.setRemainingHours(newRemainingHours);
+            if (newRemainingHours <= 0) {
+                productionOrder.setProductionStatus(ProductionStatus.COMPLETED);
             }
+
+            productionOrderRepository.save(productionOrder);
+            scheduledOrders.add(order);
         }
-        schedule.setOrders(scheduledOrders);
-        factoryScheduleRepository.save(schedule);
+
+        double newRemainingScheduleHours = Math.max(0, schedule.getRemainingHours() - factoryWorkingHours);
+        schedule.setRemainingHours(newRemainingScheduleHours);
+
+        if (newRemainingScheduleHours <= 0) {
+            schedule.setRemainingHours(0);
+            schedule.setIsAvailable(false);
+        }
+
+        schedule.getOrders().addAll(scheduledOrders);
+    }
+
+    private void scheduleNotStartedOrders(FactorySchedule schedule, List<ProductionOrder> orders) {
+        if (orders == null || orders.isEmpty()) {
+            return;
+        }
+
+        List<Order> scheduledOrders = new ArrayList<>();
+        double remainingHours = schedule.getRemainingHours();
+        double workingHoursRate = remainingHours / orders.size();
+
+        for (ProductionOrder productionOrder : orders) {
+            if (remainingHours <= 0) break;
+
+            Order order = productionOrder.getOrder();
+            productionOrder.setProductionStatus(ProductionStatus.IN_PROGRESS);
+
+            double orderRemainingHours = productionOrder.getRemainingHours();
+            if (orderRemainingHours <= 0) {
+                orderRemainingHours = productionOrder.getWorkingHours();
+            }
+
+            double hoursToDeduct = Math.min(workingHoursRate, orderRemainingHours);
+            productionOrder.setRemainingHours(orderRemainingHours - hoursToDeduct);
+
+            if (productionOrder.getRemainingHours() <= 0) {
+                productionOrder.setProductionStatus(ProductionStatus.COMPLETED);
+            }
+
+            productionOrderRepository.save(productionOrder);
+            scheduledOrders.add(order);
+            remainingHours -= hoursToDeduct;
+        }
+
+        schedule.setRemainingHours(remainingHours);
+        if (remainingHours <= 0) {
+            schedule.setIsAvailable(false);
+        }
+
+        schedule.getOrders().addAll(scheduledOrders);
     }
 }

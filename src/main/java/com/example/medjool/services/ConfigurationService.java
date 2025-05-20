@@ -31,4 +31,6 @@ public interface ConfigurationService {
 
     ResponseEntity<List<Pallet>> getAllPalletsByPackaging(float packaging);
 
+    Pallet getPalletById(Integer id);
+
 }

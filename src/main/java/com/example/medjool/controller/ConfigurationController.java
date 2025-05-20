@@ -83,6 +83,11 @@ public class ConfigurationController {
         return configurationService.updatePallet(palletId, palletDto);
     }
 
+    @GetMapping("pallet/get_by_id/{palletId}")
+    public Pallet getById(@PathVariable Integer palletId) {
+        return configurationService.getPalletById(palletId);
+    }
+
 
 
 }

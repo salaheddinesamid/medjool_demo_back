@@ -234,9 +234,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Override
     public ResponseEntity<Object> updatePallet(Integer id, UpdatePalletDto palletDto) {
-        Pallet pallet = palletRepository.findById(id).orElseThrow(()->
-                new RuntimeException("Pallet not found")
-        );
+        Pallet pallet = palletRepository.findByPalletId(id);
 
         pallet.setHeight(palletDto.getHeight());
         pallet.setWidth(palletDto.getWidth());
@@ -265,7 +263,10 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
         return ResponseEntity.ok().body(pallets);
     }
-
+    @Override
+    public Pallet getPalletById(Integer id) {
+        return palletRepository.findById(id).orElseThrow(null);
+    }
 
     @Override
     public ResponseEntity<Object> deletePallet(Integer palletId) {

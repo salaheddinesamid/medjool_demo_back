@@ -34,7 +34,6 @@ public class AuthenticationFlowTesting {
     @Autowired
     ObjectMapper objectMapper;
 
-
     private final AuthenticationServiceImpl authenticationService;
 
 

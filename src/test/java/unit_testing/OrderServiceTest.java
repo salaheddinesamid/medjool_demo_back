@@ -45,6 +45,9 @@ public class OrderServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
+    private OrderHistoryRepository orderHistoryRepository;
+
+    @Mock
     private OrderItemRepository orderItemRepository;
 
     @InjectMocks
@@ -81,9 +84,9 @@ public class OrderServiceTest {
         itemDto.setPricePerKg(2.5);
         itemDto.setPackaging(1);
         itemDto.setNumberOfPallets(1);
+        itemDto.setCurrency(OrderCurrency.MAD.toString());
 
         orderRequest.setItems(List.of(itemDto));
-        orderRequest.setCurrency(OrderCurrency.MAD.toString());
         orderRequest.setProductionDate(now);
 
         when(clientRepository.findByCompanyName("Fresh Fruits Inc")).thenReturn(client);

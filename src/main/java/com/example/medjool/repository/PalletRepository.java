@@ -9,4 +9,5 @@ public interface PalletRepository extends JpaRepository<Pallet, Integer> {
 
     List<Pallet> findAllByPackaging(float packaging);
     Pallet findByPackaging(float packaging);
+    Pallet findByPalletId(int id);
 }
