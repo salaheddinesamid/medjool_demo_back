@@ -135,6 +135,7 @@ com\example\medjool\exception\OrderExceptionController.class
 com\example\medjool\jwt\JwtUtilities.class
 com\example\medjool\controller\ConfigurationController.class
 com\example\medjool\component\SystemSettingsInitializer.class
+com\example\medjool\exception\TokenExpiredException.class
 com\example\medjool\dto\NewProductDto.class
 com\example\medjool\exception\OrderCannotBeCanceledException.class
 com\example\medjool\services\implementation\UserDetailsServiceImpl.class

@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,27 +35,30 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-                http.csrf()
+                http.
+                        cors()
+                                .and()
+
+                        .csrf()
                         .disable()
                         .authorizeHttpRequests(authorizeRequests ->
-                                authorizeRequests.requestMatchers("/api/order/**",
+                                authorizeRequests.requestMatchers(
                                         "/api/auth/**",
-                                        "/api/overview/**",
-                                        "/api/configuration/**",
-                                        "/api/settings/**",
-                                        "/api/alert/**",
-                                                "/api/production/**",
-                                        "/api/user/**",
-                                        "/api/notification/**",
-                                        "/api/shipment/**",
                                         "/swagger-ui/**",
                                         "/actuator/metrics/",
                                         "/actuator/health",
                                         "/actuator/info",
-                                        "/api-docs/**",
-                                                "/api/stock/**"
+                                        "/api-docs/**"
+
                                                 ).permitAll()
-                                        .requestMatchers("/security-test/**").hasAnyAuthority("GENERAL_MANAGER","SALES")
+                                        .requestMatchers("/api/order/**","/api/stock/get_all","/api/overview/**",
+                                                "/api/configuration/**",
+                                                "/api/settings/**",
+                                                "/api/alert/**",
+                                                "/api/production/**",
+                                                "/api/user/**",
+                                                "/api/notification/**",
+                                                "/api/shipment/**").hasAnyAuthority("GENERAL_MANAGER","SALES")
                                         .anyRequest().authenticated()
 
                         ).exceptionHandling(exceptionHandling ->
@@ -62,7 +66,7 @@ public class SecurityConfiguration {
                                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                                         .accessDeniedHandler(accessDeniedHandler())
                         )
-
+                        //.addFilterBefore(JWTExpirationCheckFilter, UsernamePasswordAuthenticationFilter.class)
                         .addFilterBefore(JWTFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -97,5 +101,4 @@ public class SecurityConfiguration {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
